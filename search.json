@@ -4,7 +4,91 @@
     "href": "index.html#motivation",
     "title": "Automatic Differentiation",
     "section": "Motivation",
-    "text": "Motivation\n\n\n\n\n\n\nWhat is a derivative?\n\n\nA linear map \\(\\partial f(x)\\) approximating a function around a point \\(x\\):\n\\[f(x + v) = f(x) + \\partial f(x)[v]\n+ o(\\lVert v \\rVert)\\]\n\n\n\n\n\n\n\n\n\nWhy do we care?\n\n\nDerivatives of computer code are essential in optimization and machine learning.\n\n\n\n\n\n\n\n\n\nWhat do I need to do?\n\n\nNot much: with Automatic Differentiation (AD), derivatives are easy to compute!"
+    "text": "Motivation\n\n\n\n\n\n\nWhat is a derivative?\n\n\nA linear approximation of a function around a point.\n\n\n\n\n\n\n\n\n\nWhy do we care?\n\n\nDerivatives of complex programs are essential in optimization and machine learning.\n\n\n\n\n\n\n\n\n\nWhat do we need to do?\n\n\nNot much: Automatic Differentiation (AD) computes derivatives for us!"
+  },
+  {
+    "objectID": "index.html#bibliography",
+    "href": "index.html#bibliography",
+    "title": "Automatic Differentiation",
+    "section": "Bibliography",
+    "text": "Bibliography\n\nBlondel and Roulet (2024): the most recent book\nGriewank and Walther (2008): the bible of the field\nBaydin et al. (2018), Margossian (2019): concise surveys"
+  },
+  {
+    "objectID": "index.html#derivatives-formal-definition",
+    "href": "index.html#derivatives-formal-definition",
+    "title": "Automatic Differentiation",
+    "section": "Derivatives: formal definition",
+    "text": "Derivatives: formal definition\nDerivative of \\(f\\) at point \\(x\\): linear map \\(\\partial f(x)\\) such that \\[f(x + v) = f(x) + \\partial f(x)[v] + o(\\lVert v \\rVert)\\]\nIn other words,\n\\[\\partial f(x)[v] = \\lim_{\\varepsilon \\to 0} \\frac{f(x + \\varepsilon v) - f(x)}{\\varepsilon}\\]"
+  },
+  {
+    "objectID": "index.html#various-flavors-of-differentiation",
+    "href": "index.html#various-flavors-of-differentiation",
+    "title": "Automatic Differentiation",
+    "section": "Various flavors of differentiation",
+    "text": "Various flavors of differentiation\n\nManual: work out \\(\\partial f\\) by hand\nNumeric: \\(\\partial f(x)[v] \\approx \\frac{f(x+\\varepsilon v) - f(x)}{\\varepsilon}\\)\nSymbolic: enter a formula for \\(f\\), get a formula for \\(\\partial f\\)\nAutomatic: code a program for \\(f\\), get a program for \\(\\partial f(x)\\)"
+  },
+  {
+    "objectID": "index.html#two-ingredients-of-ad",
+    "href": "index.html#two-ingredients-of-ad",
+    "title": "Automatic Differentiation",
+    "section": "Two ingredients of AD",
+    "text": "Two ingredients of AD\nAny derivative can be obtained from:\n\nDerivatives of basic functions: \\(\\exp, \\log, \\sin, \\cos, \\dots\\)\nComposition with the chain rule:\n\n\\[\\partial (f \\circ g)(x) = \\partial f(g(x)) \\circ \\partial g(x)\\]\nor its adjoint1\n\\[\\partial (f \\circ g)^*(x) = \\partial g(x)^* \\circ \\partial f(g(x))^*\\]\nthe “transpose” of a linear map"
+  },
+  {
+    "objectID": "index.html#homemade-ad-1",
+    "href": "index.html#homemade-ad-1",
+    "title": "Automatic Differentiation",
+    "section": "Homemade AD (1)",
+    "text": "Homemade AD (1)\nBasic functions\n\ndouble(x) = 2x\n∂(::typeof(double)) = x -&gt; (v -&gt; 2v);  # independent from x\n\n\nsquare(x) = x .^ 2\n∂(::typeof(square)) = x -&gt; (v -&gt; v .* 2x);  # depends on x\n\nChain rule\n\nfunction ∂(c::ComposedFunction)\n    f, g = c.outer, c.inner\n    return x -&gt; ∂(f)(g(x)) ∘ ∂(g)(x)\nend;"
+  },
+  {
+    "objectID": "index.html#homemade-ad-2",
+    "href": "index.html#homemade-ad-2",
+    "title": "Automatic Differentiation",
+    "section": "Homemade AD (2)",
+    "text": "Homemade AD (2)\nLet’s try it out\n\ncomplicated_function = square ∘ double ∘ square ∘ double\nx = [3, 5]\nv = [1, 2];\n∂(complicated_function)(x)(v)\n\n2-element Vector{Int64}:\n  6912\n 64000\n\n\n\nε = 1e-5\n(complicated_function(x + ε * v) - complicated_function(x)) / ε\n\n2-element Vector{Float64}:\n  6912.034559991297\n 64000.384000974"
+  },
+  {
+    "objectID": "index.html#what-about-jacobian-matrices",
+    "href": "index.html#what-about-jacobian-matrices",
+    "title": "Automatic Differentiation",
+    "section": "What about Jacobian matrices?",
+    "text": "What about Jacobian matrices?\nWe could multiply matrices instead of composing linear maps:\n\\[J_{f \\circ g}(x) = J_f(g(x)) \\cdot J_g(x)\\]\nwhere the Jacobian matrix is\n\\[J_f(x) = \\left(\\partial f_i / \\partial x_j\\right)_{i,j}\\]\n\nvery wasteful in high dimension (think of \\(f = \\mathrm{id}\\))\nill-suited to arbitrary spaces"
+  },
+  {
+    "objectID": "index.html#matrix-vector-products",
+    "href": "index.html#matrix-vector-products",
+    "title": "Automatic Differentiation",
+    "section": "Matrix-vector products",
+    "text": "Matrix-vector products\nWe don’t need Jacobian matrices as long as we can compute their products with vectors:\n\n\nJacobian-vector products\n\\[J_{f}(x) v = \\partial f(x)[v]\\]\nPropagate a perturbation \\(v\\) from input to output\n\nVector-Jacobian products\n\\[w^\\top J_{f}(x) = \\partial f(x)^*[w]\\]\nBackpropagate a sensitivity \\(w\\) from output to input"
+  },
+  {
+    "objectID": "index.html#forward-mode",
+    "href": "index.html#forward-mode",
+    "title": "Automatic Differentiation",
+    "section": "Forward mode",
+    "text": "Forward mode\nConsider \\(f = f_L \\circ \\dots \\circ f_1\\) and its Jacobian \\(J = J_L \\cdots J_1\\).\nJacobian-vector products decompose from layer \\(1\\) to layer \\(L\\):\n\\[J_L(J_{L-1}(\\dots \\underbrace{J_2(\\underbrace{J_1 v}_{v_1})}_{v_2}))\\]\nForward mode AD relies on the chain rule."
+  },
+  {
+    "objectID": "index.html#reverse-mode",
+    "href": "index.html#reverse-mode",
+    "title": "Automatic Differentiation",
+    "section": "Reverse mode",
+    "text": "Reverse mode\nConsider \\(f = f_L \\circ \\dots \\circ f_1\\) and its Jacobian \\(J = J_L \\cdots J_1\\).\nVector-Jacobian products decompose from layer \\(L\\) to layer \\(1\\):\n\\[((\\underbrace{(\\underbrace{w^\\top J_L}_{w_L}) J_{L-1}}_{w_{L-1}} \\dots ) J_2 ) J_1\\]\nReverse mode AD relies on the adjoint chain rule."
+  },
+  {
+    "objectID": "index.html#computational-complexity",
+    "href": "index.html#computational-complexity",
+    "title": "Automatic Differentiation",
+    "section": "Computational complexity",
+    "text": "Computational complexity\nConsider \\(f : \\mathbb{R}^n \\to \\mathbb{R}^m\\). How much does its Jacobian cost?\n\n\n\n\n\n\nTheorem\n\n\nEach JVP or VJP takes as much time and space as \\(O(1)\\) calls to \\(f\\).\n\n\n\n\n\nForward mode\nColumn by column: \\(O(n)\\)\n\\[J = \\begin{pmatrix} J e_1 & \\dots & J e_n \\end{pmatrix}\\]\n\nReverse mode\nRow by row: \\(O(m)\\)\n\\[J = \\begin{pmatrix} e_1^\\top J \\\\ \\dots \\\\ e_m^\\top J \\end{pmatrix}\\]"
+  },
+  {
+    "objectID": "index.html#three-types-of-ad-users",
+    "href": "index.html#three-types-of-ad-users",
+    "title": "Automatic Differentiation",
+    "section": "Three types of AD users",
+    "text": "Three types of AD users\n\nPackage users want to differentiate through functions\nPackage developers want to write differentiable functions\nBackend developers want to create new AD systems"
   },
   {
     "objectID": "index.html#python-vs.-julia-users",
@@ -21,25 +105,11 @@
     "text": "Python vs. Julia: developers\n\nImage: courtesy of Adrian Hill"
   },
   {
-    "objectID": "index.html#various-flavors-of-differentiation",
-    "href": "index.html#various-flavors-of-differentiation",
-    "title": "Automatic Differentiation",
-    "section": "Various flavors of differentiation",
-    "text": "Various flavors of differentiation\n\nManual: work out \\(\\partial f\\) by hand\nNumeric: \\(\\partial f(x)[v] \\approx \\frac{f(x+\\varepsilon v) - f(x)}{\\varepsilon}\\)\nSymbolic: code a formula for \\(f\\), get a formula for \\(\\partial f\\)\nAutomatic: code a program for \\(f\\), get a program for \\(\\partial f(x)\\)"
-  },
-  {
-    "objectID": "index.html#automatic-differentiation",
-    "href": "index.html#automatic-differentiation",
-    "title": "Automatic Differentiation",
-    "section": "Automatic differentiation",
-    "text": "Automatic differentiation\nThree key ideas (Griewank and Walther 2008):\n\nPrograms are compositions of many functions\nDifferential of \\(f = g \\circ h\\) is given by the chain rule: \\[\\partial f(x) = \\partial g(h(x)) \\circ \\partial h(x)\\]\nThink in terms of linear maps, not Jacobian matrices \\[\\partial f(x)[v] = \\partial g(h(x))[\\underbrace{\\partial h(x)[v]}_w]\\]"
-  },
-  {
     "objectID": "index.html#why-so-many-backends",
     "href": "index.html#why-so-many-backends",
     "title": "Automatic Differentiation",
     "section": "Why so many backends?",
-    "text": "Why so many backends?\n\nConflicting paradigms:\n\nnumeric vs. symbolic vs. algorithmic\noperator overloading vs. source-to-source\n\nCover varying subsets of the language\nHistorical reasons: developed by different people"
+    "text": "Why so many backends?\n\nConflicting paradigms:\n\nnumeric vs. symbolic vs. algorithmic\noperator overloading vs. source-to-source\n\nCover varying subsets of the language\nHistorical reasons: developed by different people\n\nExhaustive list available at https://juliadiff.org/."
   },
   {
     "objectID": "index.html#meaningful-criteria",
@@ -56,52 +126,101 @@
     "text": "A simple decision tree\n\nFollow recommendations of high-level library (e.g. Flux).\nOtherwise, choose mode from input/output dimensions.\nTry the most battle-tested backends:\n\nForwardDiff or Enzyme in forward mode,\nZygote or Enzyme in reverse mode.\n\nIf nothing works, fall back on finite differences."
   },
   {
-    "objectID": "index.html#typical-forwarddiff-failure",
-    "href": "index.html#typical-forwarddiff-failure",
+    "objectID": "index.html#each-backend-has-demands",
+    "href": "index.html#each-backend-has-demands",
     "title": "Automatic Differentiation",
-    "section": "Typical ForwardDiff failure",
-    "text": "Typical ForwardDiff failure\n\nimport ForwardDiff\n\nbadcopy(x) = copyto!(zeros(size(x)), x)\n\nForwardDiff.jacobian(badcopy, ones(2))\n\nMethodError: MethodError(Float64, (Dual{ForwardDiff.Tag{typeof(Main.Notebook.badcopy), Float64}}(1.0,1.0,0.0),), 0x0000000000007b07)\nMethodError: no method matching Float64(::ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2})\n\nClosest candidates are:\n  (::Type{T})(::Real, !Matched::RoundingMode) where T&lt;:AbstractFloat\n   @ Base rounding.jl:207\n  (::Type{T})(::T) where T&lt;:Number\n   @ Core boot.jl:792\n  Float64(!Matched::IrrationalConstants.Halfπ)\n   @ IrrationalConstants ~/.julia/packages/IrrationalConstants/vp5v4/src/macro.jl:112\n  ...\n\nStacktrace:\n  [1] convert(::Type{Float64}, x::ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2})\n    @ Base ./number.jl:7\n  [2] setindex!(A::Vector{Float64}, x::ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}, i1::Int64)\n    @ Base ./array.jl:1021\n  [3] _unsafe_copyto!(dest::Vector{Float64}, doffs::Int64, src::Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}, soffs::Int64, n::Int64)\n    @ Base ./array.jl:299\n  [4] unsafe_copyto!\n    @ ./array.jl:353 [inlined]\n  [5] _copyto_impl!\n    @ ./array.jl:376 [inlined]\n  [6] copyto!\n    @ ./array.jl:363 [inlined]\n  [7] copyto!\n    @ ./array.jl:385 [inlined]\n  [8] badcopy(x::Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}})\n    @ Main.Notebook ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:126\n  [9] vector_mode_dual_eval!\n    @ ~/.julia/packages/ForwardDiff/PcZ48/src/apiutils.jl:24 [inlined]\n [10] vector_mode_jacobian(f::typeof(badcopy), x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2, Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}})\n    @ ForwardDiff ~/.julia/packages/ForwardDiff/PcZ48/src/jacobian.jl:125\n [11] jacobian(f::Function, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2, Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}}, ::Val{true})\n    @ ForwardDiff ~/.julia/packages/ForwardDiff/PcZ48/src/jacobian.jl:21\n [12] jacobian(f::Function, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2, Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}})\n    @ ForwardDiff ~/.julia/packages/ForwardDiff/PcZ48/src/jacobian.jl:19\n [13] top-level scope\n    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:128"
+    "section": "Each backend has demands",
+    "text": "Each backend has demands\n\nForwardDiff: generic number types\nZygote: no mutation\nEnzyme: correct annotations, type stability"
+  },
+  {
+    "objectID": "index.html#typical-forwarddiff-misuse",
+    "href": "index.html#typical-forwarddiff-misuse",
+    "title": "Automatic Differentiation",
+    "section": "Typical ForwardDiff misuse",
+    "text": "Typical ForwardDiff misuse\n\nimport ForwardDiff\n\nbadcopy(x) = copyto!(zeros(size(x)), x)\n\nForwardDiff.jacobian(badcopy, ones(2))\n\nMethodError: MethodError(Float64, (Dual{ForwardDiff.Tag{typeof(Main.Notebook.badcopy), Float64}}(1.0,1.0,0.0),), 0x0000000000007b14)\nMethodError: no method matching Float64(::ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2})\n\nClosest candidates are:\n  (::Type{T})(::Real, !Matched::RoundingMode) where T&lt;:AbstractFloat\n   @ Base rounding.jl:207\n  (::Type{T})(::T) where T&lt;:Number\n   @ Core boot.jl:792\n  Float64(!Matched::IrrationalConstants.Halfπ)\n   @ IrrationalConstants ~/.julia/packages/IrrationalConstants/vp5v4/src/macro.jl:112\n  ...\n\nStacktrace:\n  [1] convert(::Type{Float64}, x::ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2})\n    @ Base ./number.jl:7\n  [2] setindex!(A::Vector{Float64}, x::ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}, i1::Int64)\n    @ Base ./array.jl:1021\n  [3] _unsafe_copyto!(dest::Vector{Float64}, doffs::Int64, src::Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}, soffs::Int64, n::Int64)\n    @ Base ./array.jl:299\n  [4] unsafe_copyto!\n    @ ./array.jl:353 [inlined]\n  [5] _copyto_impl!\n    @ ./array.jl:376 [inlined]\n  [6] copyto!\n    @ ./array.jl:363 [inlined]\n  [7] copyto!\n    @ ./array.jl:385 [inlined]\n  [8] badcopy(x::Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}})\n    @ Main.Notebook ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:298\n  [9] vector_mode_dual_eval!\n    @ ~/.julia/packages/ForwardDiff/PcZ48/src/apiutils.jl:24 [inlined]\n [10] vector_mode_jacobian(f::typeof(badcopy), x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2, Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}})\n    @ ForwardDiff ~/.julia/packages/ForwardDiff/PcZ48/src/jacobian.jl:125\n [11] jacobian(f::Function, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2, Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}}, ::Val{true})\n    @ ForwardDiff ~/.julia/packages/ForwardDiff/PcZ48/src/jacobian.jl:21\n [12] jacobian(f::Function, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2, Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}})\n    @ ForwardDiff ~/.julia/packages/ForwardDiff/PcZ48/src/jacobian.jl:19\n [13] top-level scope\n    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:300"
   },
   {
     "objectID": "index.html#forwarddiff-troubleshooting",
     "href": "index.html#forwarddiff-troubleshooting",
     "title": "Automatic Differentiation",
     "section": "ForwardDiff troubleshooting",
-    "text": "ForwardDiff troubleshooting\nAllow numbers of type Dual in your functions.\n\ngoodcopy(x::AbstractArray{&lt;:Real}) = copyto!(zeros(eltype(x), size(x)), x)\n\nForwardDiff.jacobian(goodcopy, ones(2))\n\n2×2 Matrix{Float64}:\n 1.0  0.0\n 0.0  1.0"
+    "text": "ForwardDiff troubleshooting\nAllow numbers of type Dual to pass through your functions.\n\ngoodcopy(x) = copyto!(zeros(eltype(x), size(x)), x)\n\nForwardDiff.jacobian(goodcopy, ones(2))\n\n2×2 Matrix{Float64}:\n 1.0  0.0\n 0.0  1.0"
   },
   {
-    "objectID": "index.html#typical-zygote-failure",
-    "href": "index.html#typical-zygote-failure",
+    "objectID": "index.html#typical-zygote-misuse",
+    "href": "index.html#typical-zygote-misuse",
     "title": "Automatic Differentiation",
-    "section": "Typical Zygote failure",
-    "text": "Typical Zygote failure\n\nimport Zygote\n\nZygote.jacobian(badcopy, ones(2))\n\nErrorException: ErrorException(\"Mutating arrays is not supported -- called copyto!(Vector{Float64}, ...)\\nThis error occurs when you ask Zygote to differentiate operations that change\\nthe elements of arrays in place (e.g. setting values with x .= ...)\\n\\nPossible fixes:\\n- avoid mutating operations (preferred)\\n- or read the documentation and solutions for this error\\n  https://fluxml.ai/Zygote.jl/latest/limitations\\n\")\nMutating arrays is not supported -- called copyto!(Vector{Float64}, ...)\nThis error occurs when you ask Zygote to differentiate operations that change\nthe elements of arrays in place (e.g. setting values with x .= ...)\n\nPossible fixes:\n- avoid mutating operations (preferred)\n- or read the documentation and solutions for this error\n  https://fluxml.ai/Zygote.jl/latest/limitations\n\nStacktrace:\n  [1] error(s::String)\n    @ Base ./error.jl:35\n  [2] _throw_mutation_error(f::Function, args::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/array.jl:70\n  [3] (::Zygote.var\"#547#548\"{Vector{Float64}})(::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/array.jl:85\n  [4] (::Zygote.var\"#2633#back#549\"{Zygote.var\"#547#548\"{Vector{Float64}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72\n  [5] badcopy\n    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:126 [inlined]\n  [6] (::Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.var\"#2633#back#549\"{Zygote.var\"#547#548\"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0\n  [7] (::Zygote.var\"#294#295\"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.var\"#2633#back#549\"{Zygote.var\"#547#548\"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/lib.jl:206\n  [8] (::Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.var\"#2633#back#549\"{Zygote.var\"#547#548\"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72\n  [9] call_composed\n    @ ./operators.jl:1045 [inlined]\n [10] (::Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0\n [11] call_composed\n    @ ./operators.jl:1044 [inlined]\n [12] #_#103\n    @ ./operators.jl:1041 [inlined]\n [13] (::Zygote.Pullback{Tuple{Base.var\"##_#103\", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.var\"#2013#back#207\"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}}}, Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.var\"#2013#back#207\"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var\"#2029#back#216\"{Zygote.var\"#back#214\"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var\"#2141#back#284\"{Zygote.var\"#280#283\"}}}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0\n [14] #294\n    @ ~/.julia/packages/Zygote/NRp5C/src/lib/lib.jl:206 [inlined]\n [15] #2169#back\n    @ ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72 [inlined]\n [16] ComposedFunction\n    @ ./operators.jl:1041 [inlined]\n [17] (::Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.var\"#2366#back#423\"{Zygote.var\"#pairs_namedtuple_pullback#422\"{(), @NamedTuple{}}}, Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var\"##_#103\", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.var\"#2013#back#207\"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}}}, Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.var\"#2013#back#207\"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var\"#2029#back#216\"{Zygote.var\"#back#214\"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var\"#2141#back#284\"{Zygote.var\"#280#283\"}}}}}}}, Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0\n [18] (::Zygote.var\"#78#79\"{Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.var\"#2366#back#423\"{Zygote.var\"#pairs_namedtuple_pullback#422\"{(), @NamedTuple{}}}, Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var\"##_#103\", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.var\"#2013#back#207\"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}}}, Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.var\"#2013#back#207\"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var\"#2029#back#216\"{Zygote.var\"#back#214\"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var\"#2141#back#284\"{Zygote.var\"#280#283\"}}}}}}}, Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface.jl:91\n [19] withjacobian(f::Function, args::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/grad.jl:150\n [20] jacobian(f::Function, args::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/grad.jl:128\n [21] top-level scope\n    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:154"
+    "section": "Typical Zygote misuse",
+    "text": "Typical Zygote misuse\n\nimport Zygote\n\nZygote.jacobian(badcopy, ones(2))\n\nErrorException: ErrorException(\"Mutating arrays is not supported -- called copyto!(Vector{Float64}, ...)\\nThis error occurs when you ask Zygote to differentiate operations that change\\nthe elements of arrays in place (e.g. setting values with x .= ...)\\n\\nPossible fixes:\\n- avoid mutating operations (preferred)\\n- or read the documentation and solutions for this error\\n  https://fluxml.ai/Zygote.jl/latest/limitations\\n\")\nMutating arrays is not supported -- called copyto!(Vector{Float64}, ...)\nThis error occurs when you ask Zygote to differentiate operations that change\nthe elements of arrays in place (e.g. setting values with x .= ...)\n\nPossible fixes:\n- avoid mutating operations (preferred)\n- or read the documentation and solutions for this error\n  https://fluxml.ai/Zygote.jl/latest/limitations\n\nStacktrace:\n  [1] error(s::String)\n    @ Base ./error.jl:35\n  [2] _throw_mutation_error(f::Function, args::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/array.jl:70\n  [3] (::Zygote.var\"#547#548\"{Vector{Float64}})(::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/array.jl:85\n  [4] (::Zygote.var\"#2633#back#549\"{Zygote.var\"#547#548\"{Vector{Float64}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72\n  [5] badcopy\n    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:298 [inlined]\n  [6] (::Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.var\"#2633#back#549\"{Zygote.var\"#547#548\"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0\n  [7] (::Zygote.var\"#294#295\"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.var\"#2633#back#549\"{Zygote.var\"#547#548\"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/lib.jl:206\n  [8] (::Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.var\"#2633#back#549\"{Zygote.var\"#547#548\"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72\n  [9] call_composed\n    @ ./operators.jl:1045 [inlined]\n [10] (::Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0\n [11] call_composed\n    @ ./operators.jl:1044 [inlined]\n [12] #_#103\n    @ ./operators.jl:1041 [inlined]\n [13] (::Zygote.Pullback{Tuple{Base.var\"##_#103\", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var\"#2141#back#284\"{Zygote.var\"#280#283\"}, Zygote.var\"#2029#back#216\"{Zygote.var\"#back#214\"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}, Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}}}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0\n [14] #294\n    @ ~/.julia/packages/Zygote/NRp5C/src/lib/lib.jl:206 [inlined]\n [15] #2169#back\n    @ ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72 [inlined]\n [16] ComposedFunction\n    @ ./operators.jl:1041 [inlined]\n [17] (::Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.var\"#2013#back#207\"{typeof(identity)}, Zygote.var\"#2366#back#423\"{Zygote.var\"#pairs_namedtuple_pullback#422\"{(), @NamedTuple{}}}, Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var\"##_#103\", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var\"#2141#back#284\"{Zygote.var\"#280#283\"}, Zygote.var\"#2029#back#216\"{Zygote.var\"#back#214\"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}, Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}}}}}}}, Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0\n [18] (::Zygote.var\"#78#79\"{Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.var\"#2013#back#207\"{typeof(identity)}, Zygote.var\"#2366#back#423\"{Zygote.var\"#pairs_namedtuple_pullback#422\"{(), @NamedTuple{}}}, Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var\"##_#103\", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var\"#2141#back#284\"{Zygote.var\"#280#283\"}, Zygote.var\"#2029#back#216\"{Zygote.var\"#back#214\"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.var\"#2169#back#296\"{Zygote.var\"#294#295\"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}, Zygote.var\"#2180#back#306\"{Zygote.var\"#back#305\"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}, Zygote.var\"#2013#back#207\"{typeof(identity)}}}}}}}}}, Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}}}})(Δ::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface.jl:91\n [19] withjacobian(f::Function, args::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/grad.jl:150\n [20] jacobian(f::Function, args::Vector{Float64})\n    @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/grad.jl:128\n [21] top-level scope\n    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:326"
   },
   {
     "objectID": "index.html#zygote-troubleshooting",
     "href": "index.html#zygote-troubleshooting",
     "title": "Automatic Differentiation",
     "section": "Zygote troubleshooting",
-    "text": "Zygote troubleshooting\nDefine a custom rule with ChainRulesCore:\n\nusing ChainRulesCore, LinearAlgebra\n\nbadcopy2(x) = badcopy(x)\n\nfunction ChainRulesCore.rrule(::typeof(badcopy2), x)\n    @info \"My rule is called\"\n    y = badcopy2(x)  # primal value\n    function badcopy2_pullback(dy)\n    @info \"My pullback is called\"\n        df = NoTangent()\n        dx = I' * dy # Vector-Jacobian product\n        return (df, dx)\n    end\n    return y, badcopy2_pullback\nend\n\nZygote.jacobian(badcopy2, ones(2))\n\n[ Info: My rule is called\n[ Info: My pullback is called\n[ Info: My pullback is called\n\n\n([1.0 0.0; 0.0 1.0],)"
+    "text": "Zygote troubleshooting\nDefine a custom rule with ChainRulesCore:\n\nusing ChainRulesCore, LinearAlgebra\n\nbadcopy2(x) = badcopy(x)\n\nfunction ChainRulesCore.rrule(::typeof(badcopy2), x)\n    y = badcopy2(x)\n    function badcopy2_pullback(dy)\n        df, dx = NoTangent(), I' * dy  # VJP\n        return (df, dx)\n    end\n    return y, badcopy2_pullback\nend\n\nZygote.jacobian(badcopy2, ones(2))\n\n([1.0 0.0; 0.0 1.0],)"
   },
   {
-    "objectID": "index.html#typical-enzyme-failure",
-    "href": "index.html#typical-enzyme-failure",
+    "objectID": "index.html#typical-enzyme-misuse",
+    "href": "index.html#typical-enzyme-misuse",
     "title": "Automatic Differentiation",
-    "section": "Typical Enzyme failure",
-    "text": "Typical Enzyme failure\n\nimport Enzyme\n\nEnzyme.autodiff(\n  Enzyme.Forward,\n  badcopy,\n  Enzyme.Active(ones(2))\n)\n\nErrorException: ErrorException(\"Unsupported Active{Vector{Float64}}, consider Duplicated or Const\")\nUnsupported Active{Vector{Float64}}, consider Duplicated or Const\nStacktrace:\n [1] error(s::String)\n   @ Base ./error.jl:35\n [2] EnzymeCore.Active(x::Vector{Float64})\n   @ EnzymeCore ~/.julia/packages/EnzymeCore/frpza/src/EnzymeCore.jl:50\n [3] top-level scope\n   @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:194"
+    "section": "Typical Enzyme misuse",
+    "text": "Typical Enzyme misuse\n\nimport Enzyme\n\nEnzyme.autodiff(\n  Enzyme.Forward,\n  badcopy,\n  Enzyme.Active(ones(2))\n)\n\nErrorException: ErrorException(\"Unsupported Active{Vector{Float64}}, consider Duplicated or Const\")\nUnsupported Active{Vector{Float64}}, consider Duplicated or Const\nStacktrace:\n [1] error(s::String)\n   @ Base ./error.jl:35\n [2] EnzymeCore.Active(x::Vector{Float64})\n   @ EnzymeCore ~/.julia/packages/EnzymeCore/frpza/src/EnzymeCore.jl:50\n [3] top-level scope\n   @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:363"
   },
   {
     "objectID": "index.html#enzyme-troubleshooting",
     "href": "index.html#enzyme-troubleshooting",
     "title": "Automatic Differentiation",
     "section": "Enzyme troubleshooting",
-    "text": "Enzyme troubleshooting\nPay attention to type stability, temporary storage and activity annotations (see the FAQ).\nEnzyme.autodiff(\n  Enzyme.Forward,\n  badcopy,\n  Enzyme.Duplicated(ones(2), zeros(2))\n)"
+    "text": "Enzyme troubleshooting\nPay attention to activity annotations, type stability and temporary storage (see the FAQ).\nEnzyme.autodiff(\n  Enzyme.Forward,\n  badcopy,\n  Enzyme.Duplicated(ones(2), zeros(2))\n)"
+  },
+  {
+    "objectID": "index.html#goals",
+    "href": "index.html#goals",
+    "title": "Automatic Differentiation",
+    "section": "Goals",
+    "text": "Goals\n\nDifferentiationInterface (DI) offers a common syntax for all AD backends1\nAD users can compare correctness and performance without reading each documentation\nAD developers get access to a wider user base\n\n\n\n\n\n\n\nThe fine print\n\n\nDI may be slower than a direct call to the backend’s API (mostly with Enzyme).\n\n\n\ninspired by AbstractDifferentiation"
+  },
+  {
+    "objectID": "index.html#supported-packages",
+    "href": "index.html#supported-packages",
+    "title": "Automatic Differentiation",
+    "section": "Supported packages",
+    "text": "Supported packages\n\n\n\n\nChainRulesCore\nDiffractor\nEnzyme\nFastDifferentiation\nFiniteDiff\nFiniteDifferences\nForwardDiff\n\n\n\nPolyesterForwardDiff\nReverseDiff\nSymbolics\nMooncake\nTracker\nZygote"
+  },
+  {
+    "objectID": "index.html#getting-started",
+    "href": "index.html#getting-started",
+    "title": "Automatic Differentiation",
+    "section": "Getting started",
+    "text": "Getting started\n\nLoad the necessary packages\n\n\nusing DifferentiationInterface; import ForwardDiff, Enzyme, Zygote\nf(x) = sum(abs2, x)\nx = [1.0, 2.0, 3.0, 4.0]\n\n\nCombine one of DI’s operators with a backend from ADTypes\n\n\nvalue_and_gradient(f, AutoForwardDiff(), x)\n\n(30.0, [2.0, 4.0, 6.0, 8.0])\n\n\n\nvalue_and_gradient(f, AutoEnzyme(), x)\n\n(30.0, [2.0, 4.0, 6.0, 8.0])\n\n\n\nvalue_and_gradient(f, AutoZygote(), x)\n\n(30.0, [2.0, 4.0, 6.0, 8.0])\n\n\n\nIncrease performance via DI’s preparation mechanism."
+  },
+  {
+    "objectID": "index.html#features",
+    "href": "index.html#features",
+    "title": "Automatic Differentiation",
+    "section": "Features",
+    "text": "Features\n\nSupport for functions f(x) or f!(y, x) with scalar/array inputs & outputs\nEight standard operators: pushforward, pullback, derivative, gradient, jacobian, hvp, second_derivative, hessian\nOut-of-place and in-place versions\nCombine different backends using SecondOrder\nTranslate between backends using DifferentiateWith"
+  },
+  {
+    "objectID": "index.html#going-further",
+    "href": "index.html#going-further",
+    "title": "Automatic Differentiation",
+    "section": "Going further",
+    "text": "Going further\n\nAD through a simple function\nAD through an expectation (Mohamed et al. 2020)\nAD through a convex solver (Blondel et al. 2022)\nAD through a combinatorial solver (Mandi et al. 2023)"
+  },
+  {
+    "objectID": "index.html#take-home-message",
+    "href": "index.html#take-home-message",
+    "title": "Automatic Differentiation",
+    "section": "Take-home message",
+    "text": "Take-home message\nComputing derivatives is easy, but each AD solution comes with its own limitations.\nLearn to recognize and overcome them, either as a user or as a developer."
   },
   {
     "objectID": "index.html#references",
     "href": "index.html#references",
     "title": "Automatic Differentiation",
     "section": "References",
-    "text": "References\n\n\nGriewank, Andreas, and Andrea Walther. 2008. Evaluating Derivatives: Principles and Techniques of Algorithmic Differentiation. 2nd ed. Philadelphia, PA: Society for Industrial and Applied Mathematics."
+    "text": "References\n\n\nBaydin, Atilim Gunes, Barak A. Pearlmutter, Alexey Andreyevich Radul, and Jeffrey Mark Siskind. 2018. “Automatic Differentiation in Machine Learning: A Survey.” Journal of Machine Learning Research 18 (153): 1–43. http://jmlr.org/papers/v18/17-468.html.\n\n\nBlondel, Mathieu, Quentin Berthet, Marco Cuturi, Roy Frostig, Stephan Hoyer, Felipe Llinares-López, Fabian Pedregosa, and Jean-Philippe Vert. 2022. “Efficient and Modular Implicit Differentiation.” In Advances in Neural Information Processing Systems. https://openreview.net/forum?id=Q-HOv_zn6G.\n\n\nBlondel, Mathieu, and Vincent Roulet. 2024. “The Elements of Differentiable Programming.” arXiv. https://doi.org/10.48550/arXiv.2403.14606.\n\n\nGriewank, Andreas, and Andrea Walther. 2008. Evaluating Derivatives: Principles and Techniques of Algorithmic Differentiation. 2nd ed. Philadelphia, PA: Society for Industrial and Applied Mathematics.\n\n\nMandi, Jayanta, James Kotary, Senne Berden, Maxime Mulamba, Victor Bucarey, Tias Guns, and Ferdinando Fioretto. 2023. “Decision-Focused Learning: Foundations, State of the Art, Benchmark and Future Opportunities.” arXiv. https://doi.org/10.48550/arXiv.2307.13565.\n\n\nMargossian, Charles C. 2019. “A Review of Automatic Differentiation and Its Efficient Implementation.” WIREs Data Mining and Knowledge Discovery 9 (4): e1305. https://doi.org/10.1002/widm.1305.\n\n\nMohamed, Shakir, Mihaela Rosca, Michael Figurnov, and Andriy Mnih. 2020. “Monte Carlo Gradient Estimation in Machine Learning.” Journal of Machine Learning Research 21 (132): 1–62. http://jmlr.org/papers/v21/19-346.html."
   }
 ]
