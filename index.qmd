@@ -1,0 +1,71 @@
+---
+title: "Automatic Differentiation"
+subtitle: "Julia's most confusing superpower?"
+author:
+  - name: Guillaume Dalle
+    orcid: 0000-0003-4866-1687
+    email: guillaume.dalle@epfl.ch
+    affiliation: 
+      - name: EPFL
+      - department: IdePHICS, INDY & SPOC laboratories
+  - name: Adrian Hill
+    orcid: 0009-0009-5977-301X
+    email: hill@tu-berlin.de
+    affiliation: 
+      - name: TU Berlin
+      - department: Machine Learning group
+date: "2024-10-29"
+bibliography: AutoDiff.bib
+engine: julia
+format:
+  revealjs:
+    toc: true
+    toc-depth: 1
+    slide-number: true
+    overview: true
+    code-line-numbers: false
+    scrollable: true
+execute:
+    echo: true
+    freeze: auto
+    error: true
+---
+
+# Introduction
+
+## Motivation
+
+::: {.callout-note}
+## What is a derivative?
+
+A linear approximation of a function around a point.
+:::
+
+::: {.callout-important}
+## Why do we care?
+
+Derivatives of computer code are essential in optimization and machine learning.
+:::
+
+::: {.callout-tip}
+## What do I need to do?
+
+Not much: with Automatic Differentiation (AD), derivatives are easy to compute!
+:::
+
+## Python vs. Julia: users {.smaller}
+
+![](img/python_julia_user.png)
+
+Image: courtesy of Adrian Hill
+
+## Python vs. Julia: developers {.smaller}
+
+![](img/python_julia_dev.png)
+
+Image: courtesy of Adrian Hill
+
+## References
+
+::: {#refs}
+:::
