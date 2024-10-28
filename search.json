@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "index.html#motivation",
+    "href": "index.html#motivation",
+    "title": "Automatic Differentiation",
+    "section": "Motivation",
+    "text": "Motivation\n\n\n\n\n\n\nWhat is a derivative?\n\n\nA linear approximation of a function around a point.\n\n\n\n\n\n\n\n\n\nWhy do we care?\n\n\nDerivatives of computer code are essential in optimization and machine learning.\n\n\n\n\n\n\n\n\n\nWhat do I need to do?\n\n\nNot much: with Automatic Differentiation (AD), derivatives are easy to compute!"
+  },
+  {
+    "objectID": "index.html#python-vs.-julia-users",
+    "href": "index.html#python-vs.-julia-users",
+    "title": "Automatic Differentiation",
+    "section": "Python vs. Julia: users",
+    "text": "Python vs. Julia: users\n\nImage: courtesy of Adrian Hill"
+  },
+  {
+    "objectID": "index.html#python-vs.-julia-developers",
+    "href": "index.html#python-vs.-julia-developers",
+    "title": "Automatic Differentiation",
+    "section": "Python vs. Julia: developers",
+    "text": "Python vs. Julia: developers\n\nImage: courtesy of Adrian Hill"
+  },
+  {
+    "objectID": "index.html#references",
+    "href": "index.html#references",
+    "title": "Automatic Differentiation",
+    "section": "References",
+    "text": "References"
+  }
+]
