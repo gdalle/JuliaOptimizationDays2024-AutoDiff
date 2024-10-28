@@ -1,3 +1,21 @@
+@inproceedings{amosOptNetDifferentiableOptimization2017,
+  title = {{{OptNet}}: {{Differentiable Optimization}} as a {{Layer}} in {{Neural Networks}}},
+  shorttitle = {{{OptNet}}},
+  booktitle = {Proceedings of the 34th {{International Conference}} on {{Machine Learning}}},
+  author = {Amos, Brandon and Kolter, J. Zico},
+  year = {2017},
+  month = jul,
+  pages = {136--145},
+  publisher = {PMLR},
+  issn = {2640-3498},
+  url = {https://proceedings.mlr.press/v70/amos17a.html},
+  urldate = {2022-10-13},
+  abstract = {This paper presents OptNet, a network architecture that integrates optimization problems (here, specifically in the form of quadratic programs) as individual layers in larger end-to-end trainable deep networks. These layers encode constraints and complex dependencies between the hidden states that traditional convolutional and fully-connected layers often cannot capture. In this paper, we explore the foundations for such an architecture: we show how techniques from sensitivity analysis, bilevel optimization, and implicit differentiation can be used to exactly differentiate through these layers and with respect to layer parameters; we develop a highly efficient solver for these layers that exploits fast GPU-based batch solves within a primal-dual interior point method, and which provides backpropagation gradients with virtually no additional cost on top of the solve; and we highlight the application of these approaches in several problems. In one notable example, we show that the method is capable of learning to play mini-Sudoku (4x4) given just input and output games, with no a priori information about the rules of the game; this highlights the ability of our architecture to learn hard constraints better than other neural architectures.},
+  langid = {english},
+  keywords = {autodiff,done,inferopt,thesis},
+  file = {/home/gdalle/snap/zotero-snap/common/Zotero/storage/EZRBDFJB/Amos and Kolter - 2017 - OptNet Differentiable Optimization as a Layer in .pdf;/home/gdalle/snap/zotero-snap/common/Zotero/storage/PQCHDRHL/Amos_Kolter_2017_OptNet.pdf}
+}
+
 @article{baydinAutomaticDifferentiationMachine2018,
   title = {Automatic {{Differentiation}} in {{Machine Learning}}: A {{Survey}}},
   shorttitle = {Automatic {{Differentiation}} in {{Machine Learning}}},
@@ -33,18 +51,18 @@
   title = {The {{Elements}} of {{Differentiable Programming}}},
   author = {Blondel, Mathieu and Roulet, Vincent},
   year = {2024},
-  month = mar,
+  month = jul,
   number = {arXiv:2403.14606},
   eprint = {2403.14606},
   primaryclass = {cs},
   publisher = {arXiv},
   doi = {10.48550/arXiv.2403.14606},
   url = {http://arxiv.org/abs/2403.14606},
-  urldate = {2024-03-22},
+  urldate = {2024-08-06},
   abstract = {Artificial intelligence has recently experienced remarkable advances, fueled by large models, vast datasets, accelerated hardware, and, last but not least, the transformative power of differentiable programming. This new programming paradigm enables end-to-end differentiation of complex computer programs (including those with control flows and data structures), making gradient-based optimization of program parameters possible. As an emerging paradigm, differentiable programming builds upon several areas of computer science and applied mathematics, including automatic differentiation, graphical models, optimization and statistics. This book presents a comprehensive review of the fundamental concepts useful for differentiable programming. We adopt two main perspectives, that of optimization and that of probability, with clear analogies between the two. Differentiable programming is not merely the differentiation of programs, but also the thoughtful design of programs intended for differentiation. By making programs differentiable, we inherently introduce probability distributions over their execution, providing a means to quantify the uncertainty associated with program outputs.},
   archiveprefix = {arXiv},
-  keywords = {autodiff,diffexp,done,tracer},
-  file = {/home/gdalle/snap/zotero-snap/common/Zotero/storage/3KCV6KRG/Blondel_Roulet_2024_The Elements of Differentiable Programming.pdf;/home/gdalle/snap/zotero-snap/common/Zotero/storage/B7URG3VS/2403.html}
+  keywords = {autodiff,done},
+  file = {/home/gdalle/snap/zotero-snap/common/Zotero/storage/6LFEKUZA/Blondel_Roulet_2024_The Elements of Differentiable Programming.pdf;/home/gdalle/snap/zotero-snap/common/Zotero/storage/7VQWVTKF/2403.html}
 }
 
 @article{gebremedhinWhatColorYour2005,
@@ -83,6 +101,25 @@
   file = {/home/gdalle/snap/zotero-snap/common/Zotero/storage/ZBNZIFGC/Griewank_Walther_2008_Evaluating Derivatives.pdf}
 }
 
+@misc{mandiDecisionFocusedLearningFoundations2023,
+  title = {Decision-{{Focused Learning}}: {{Foundations}}, {{State}} of the {{Art}}, {{Benchmark}} and {{Future Opportunities}}},
+  shorttitle = {Decision-{{Focused Learning}}},
+  author = {Mandi, Jayanta and Kotary, James and Berden, Senne and Mulamba, Maxime and Bucarey, Victor and Guns, Tias and Fioretto, Ferdinando},
+  year = {2023},
+  month = jul,
+  number = {arXiv:2307.13565},
+  eprint = {2307.13565},
+  primaryclass = {cs, math},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.2307.13565},
+  url = {http://arxiv.org/abs/2307.13565},
+  urldate = {2023-07-27},
+  abstract = {Decision-focused learning (DFL) is an emerging paradigm in machine learning which trains a model to optimize decisions, integrating prediction and optimization in an end-to-end system. This paradigm holds the promise to revolutionize decision-making in many real-world applications which operate under uncertainty, where the estimation of unknown parameters within these decision models often becomes a substantial roadblock. This paper presents a comprehensive review of DFL. It provides an in-depth analysis of the various techniques devised to integrate machine learning and optimization models introduces a taxonomy of DFL methods distinguished by their unique characteristics, and conducts an extensive empirical evaluation of these methods proposing suitable benchmark dataset and tasks for DFL. Finally, the study provides valuable insights into current and potential future avenues in DFL research.},
+  archiveprefix = {arXiv},
+  keywords = {autodiff,corifer,done},
+  file = {/home/gdalle/snap/zotero-snap/common/Zotero/storage/XSXDGJ6F/Mandi et al. - 2023 - Decision-Focused Learning Foundations, State of t.pdf;/home/gdalle/snap/zotero-snap/common/Zotero/storage/WLJLUUJG/2307.html}
+}
+
 @article{margossianReviewAutomaticDifferentiation2019,
   title = {A Review of Automatic Differentiation and Its Efficient Implementation},
   author = {Margossian, Charles C.},
@@ -99,4 +136,36 @@
   langid = {english},
   keywords = {autodiff,done,inferopt,thesis,tracer},
   file = {/home/gdalle/snap/zotero-snap/common/Zotero/storage/G6C6EX8U/Margossian_2019_A review of automatic differentiation and its efficient implementation.pdf;/home/gdalle/snap/zotero-snap/common/Zotero/storage/2JWFI24S/widm.html}
+}
+
+@article{mohamedMonteCarloGradient2020,
+  title = {Monte {{Carlo Gradient Estimation}} in {{Machine Learning}}},
+  author = {Mohamed, Shakir and Rosca, Mihaela and Figurnov, Michael and Mnih, Andriy},
+  year = {2020},
+  journal = {Journal of Machine Learning Research},
+  volume = {21},
+  number = {132},
+  pages = {1--62},
+  issn = {1533-7928},
+  url = {http://jmlr.org/papers/v21/19-346.html},
+  urldate = {2022-10-21},
+  abstract = {This paper is a broad and accessible survey of the methods we have at our disposal for Monte Carlo gradient estimation in machine learning and across the statistical sciences: the problem of computing the gradient of an expectation of a function with respect to parameters defining the distribution that is integrated; the problem of sensitivity analysis. In machine learning research, this gradient problem lies at the core of many learning problems, in supervised, unsupervised and reinforcement learning. We will generally seek to rewrite such gradients in a form that allows for Monte Carlo estimation, allowing them to be easily and efficiently used and analysed. We explore three strategies---the pathwise, score function, and measure-valued gradient estimators---exploring their historical development, derivation, and underlying assumptions. We describe their use in other fields, show how they are related and can be combined, and expand on their possible generalisations. Wherever Monte Carlo gradient estimators have been derived and deployed in the past, important advances have followed. A deeper and more widely-held understanding of this problem will lead to further advances, and it is these advances that we wish to support.},
+  keywords = {autodiff,diffexp,done},
+  file = {/home/gdalle/snap/zotero-snap/common/Zotero/storage/6KTY5IG4/Mohamed et al. - 2020 - Monte Carlo Gradient Estimation in Machine Learnin.pdf;/home/gdalle/snap/zotero-snap/common/Zotero/storage/IMI4JXES/mc_gradients.html}
+}
+
+@article{schulmanGradientEstimationUsing2015,
+  title = {Gradient {{Estimation Using Stochastic Computation Graphs}}},
+  author = {Schulman, John and Heess, Nicolas and Weber, Theophane and Abbeel, Pieter},
+  year = {2015},
+  month = jun,
+  journal = {arXiv:1506.05254 [cs]},
+  eprint = {1506.05254},
+  primaryclass = {cs},
+  url = {http://arxiv.org/abs/1506.05254},
+  urldate = {2019-06-08},
+  abstract = {In a variety of problems originating in supervised, unsupervised, and reinforcement learning, the loss function is defined by an expectation over a collection of random variables, which might be part of a probabilistic model or the external world. Estimating the gradient of this loss function, using samples, lies at the core of gradient-based learning algorithms for these problems. We introduce the formalism of stochastic computation graphs---directed acyclic graphs that include both deterministic functions and conditional probability distributions---and describe how to easily and automatically derive an unbiased estimator of the loss function's gradient. The resulting algorithm for computing the gradient estimator is a simple modification of the standard backpropagation algorithm. The generic scheme we propose unifies estimators derived in variety of prior work, along with variance-reduction techniques therein. It could assist researchers in developing intricate models involving a combination of stochastic and deterministic operations, enabling, for example, attention, memory, and control actions.},
+  archiveprefix = {arXiv},
+  keywords = {autodiff,done},
+  file = {/home/gdalle/snap/zotero-snap/common/Zotero/storage/MCMS2BMX/Schulman et al_2015_Gradient Estimation Using Stochastic Computation Graphs.pdf;/home/gdalle/snap/zotero-snap/common/Zotero/storage/AULMDCMQ/1506.html}
 }
