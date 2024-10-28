@@ -38,7 +38,10 @@ execute:
 ::: {.callout-note}
 ## What is a derivative?
 
-A linear approximation of a function around a point.
+A linear map $\partial f(x)$ approximating a function around a point $x$:
+
+$$f(x + v) = f(x) + \partial f(x)[v]
+ + o(\lVert v \rVert)$$
 :::
 
 ::: {.callout-important}
@@ -64,6 +67,128 @@ Image: courtesy of Adrian Hill
 ![](img/python_julia_dev.png)
 
 Image: courtesy of Adrian Hill
+
+# Understanding AD
+
+## Various flavors of differentiation
+
+- **Manual**: work out $\partial f$ by hand
+- **Numeric**: $\partial f(x)[v] \approx \frac{f(x+\varepsilon v) - f(x)}{\varepsilon}$
+- **Symbolic**: code a formula for $f$, get a formula for $\partial f$
+- **Automatic**: code a program for $f$, get a program for $\partial f(x)$
+
+## Automatic differentiation 
+
+Three key ideas [@griewankEvaluatingDerivativesPrinciples2008]:
+
+1. Programs are **compositions** of many functions
+2. Differential of $f = g \circ h$ is given by the **chain rule**: $$\partial f(x) = \partial g(h(x)) \circ \partial h(x)$$
+3. Think in terms of **linear maps**, not Jacobian matrices $$\partial f(x)[v] = \partial g(h(x))[\underbrace{\partial h(x)[v]}_w]$$
+
+## 
+
+# Using AD
+
+## Why so many backends?
+
+- Conflicting **paradigms**:
+  - numeric vs. symbolic vs. algorithmic
+  - operator overloading vs.  source-to-source
+- Cover varying **subsets of the language**
+- Historical reasons: developed by **different people**
+
+## Meaningful criteria
+
+- Does this AD backend execute **without error**?
+- Does it return the **right derivative**?
+- Does it run **fast enough** for me?
+
+## A simple decision tree
+
+1. **Follow recommendations** of high-level library (e.g. Flux).
+2. Otherwise, **choose mode** from input/output dimensions.
+3. Try the most **battle-tested** backends:
+   - [ForwardDiff](https://github.com/JuliaDiff/ForwardDiff.jl) or [Enzyme](https://github.com/EnzymeAD/Enzyme.jl) in forward mode,
+   - [Zygote](https://github.com/FluxML/Zygote.jl) or [Enzyme](https://github.com/EnzymeAD/Enzyme.jl) in reverse mode.
+4. If nothing works, fall back on finite differences.
+
+# Debugging AD
+
+## Typical ForwardDiff failure
+
+```{julia}
+import ForwardDiff
+
+badcopy(x) = copyto!(zeros(size(x)), x)
+
+ForwardDiff.jacobian(badcopy, ones(2))
+```
+
+## ForwardDiff troubleshooting
+
+Allow numbers of [type `Dual`](https://juliadiff.org/ForwardDiff.jl/stable/dev/how_it_works/) in your functions.
+
+```{julia}
+goodcopy(x::AbstractArray{<:Real}) = copyto!(zeros(eltype(x), size(x)), x)
+
+ForwardDiff.jacobian(goodcopy, ones(2))
+```
+
+## Typical Zygote failure
+
+```{julia}
+import Zygote
+
+Zygote.jacobian(badcopy, ones(2))
+```
+
+## Zygote troubleshooting
+
+Define a [custom rule](https://juliadiff.org/ChainRulesCore.jl/stable/) with [ChainRulesCore](https://github.com/JuliaDiff/ChainRulesCore.jl):
+
+```{julia}
+using ChainRulesCore, LinearAlgebra
+
+badcopy2(x) = badcopy(x)
+
+function ChainRulesCore.rrule(::typeof(badcopy2), x)
+    @info "My rule is called"
+    y = badcopy2(x)  # primal value
+    function badcopy2_pullback(dy)
+    @info "My pullback is called"
+        df = NoTangent()
+        dx = I' * dy # Vector-Jacobian product
+        return (df, dx)
+    end
+    return y, badcopy2_pullback
+end
+
+Zygote.jacobian(badcopy2, ones(2))
+```
+
+## Typical Enzyme failure 
+
+```{julia}
+import Enzyme
+
+Enzyme.autodiff(
+  Enzyme.Forward,
+  badcopy,
+  Enzyme.Active(ones(2))
+)
+```
+
+## Enzyme troubleshooting
+
+Pay attention to type stability, temporary storage and activity annotations (see the [FAQ](https://enzymead.github.io/Enzyme.jl/stable/faq/)).
+
+```julia
+Enzyme.autodiff(
+  Enzyme.Forward,
+  badcopy,
+  Enzyme.Duplicated(ones(2), zeros(2))
+)
+```
 
 ## References
 
