@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-html/tabby.min.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -408,6 +408,9 @@
       margin-right: 0; 
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+  
+  <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -559,37 +562,43 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <p>Basic functions</p>
 <div id="2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">double</span>(x) <span class="op">=</span> <span class="fl">2</span>x</span>
-<span id="cb1-2"><a aria-hidden="true" tabindex="-1"></a><span class="fu">∂</span>(<span class="op">::</span><span class="dt">typeof</span>(double)) <span class="op">=</span> x <span class="op">-&gt;</span> (v <span class="op">-&gt;</span> <span class="fl">2</span>v);  <span class="co"># independent from x</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a aria-hidden="true" tabindex="-1"></a><span class="fu">∂</span>(<span class="op">::</span><span class="dt">typeof</span>(double)) <span class="op">=</span> x <span class="op">-&gt;</span> (v <span class="op">-&gt;</span> <span class="fl">2</span>v)  <span class="co"># independent from x</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="4" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">square</span>(x) <span class="op">=</span> x <span class="op">.^</span> <span class="fl">2</span></span>
-<span id="cb2-2"><a aria-hidden="true" tabindex="-1"></a><span class="fu">∂</span>(<span class="op">::</span><span class="dt">typeof</span>(square)) <span class="op">=</span> x <span class="op">-&gt;</span> (v <span class="op">-&gt;</span> v <span class="op">.*</span> <span class="fl">2</span>x);  <span class="co"># depends on x</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a aria-hidden="true" tabindex="-1"></a><span class="fu">∂</span>(<span class="op">::</span><span class="dt">typeof</span>(square)) <span class="op">=</span> x <span class="op">-&gt;</span> (v <span class="op">-&gt;</span> v <span class="op">.*</span> <span class="fl">2</span>x)  <span class="co"># depends on x</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Chain rule</p>
 <div id="6" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">∂</span>(c<span class="op">::</span><span class="dt">ComposedFunction</span>)</span>
-<span id="cb3-2"><a aria-hidden="true" tabindex="-1"></a>    f, g <span class="op">=</span> c.outer, c.inner</span>
-<span id="cb3-3"><a aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x <span class="op">-&gt;</span> <span class="fu">∂</span>(f)(<span class="fu">g</span>(x)) <span class="op">∘</span> <span class="fu">∂</span>(g)(x)</span>
-<span id="cb3-4"><a aria-hidden="true" tabindex="-1"></a><span class="kw">end</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(square <span class="op">∘</span> double)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>ComposedFunction{typeof(square), typeof(double)}</code></pre>
+</div>
+</div>
+<div id="8" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">∂</span>(c<span class="op">::</span><span class="dt">ComposedFunction</span>)</span>
+<span id="cb5-2"><a aria-hidden="true" tabindex="-1"></a>    f, g <span class="op">=</span> c.outer, c.inner</span>
+<span id="cb5-3"><a aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x <span class="op">-&gt;</span> <span class="fu">∂</span>(f)(<span class="fu">g</span>(x)) <span class="op">∘</span> <span class="fu">∂</span>(g)(x)</span>
+<span id="cb5-4"><a aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="homemade-ad-2" class="slide level2">
 <h2>Homemade AD (2)</h2>
 <p>Let’s try it out</p>
-<div id="8" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a aria-hidden="true" tabindex="-1"></a>complicated_function <span class="op">=</span> square <span class="op">∘</span> double <span class="op">∘</span> square <span class="op">∘</span> double</span>
-<span id="cb4-2"><a aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="fl">3.0</span>, <span class="fl">5.0</span>]</span>
-<span id="cb4-3"><a aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">0.0</span>];</span>
-<span id="cb4-4"><a aria-hidden="true" tabindex="-1"></a><span class="fu">∂</span>(complicated_function)(x)(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="10" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a aria-hidden="true" tabindex="-1"></a>complicated_function <span class="op">=</span> square <span class="op">∘</span> double <span class="op">∘</span> square <span class="op">∘</span> double</span>
+<span id="cb6-2"><a aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="fl">3.0</span>, <span class="fl">5.0</span>]</span>
+<span id="cb6-3"><a aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">0.0</span>];</span>
+<span id="cb6-4"><a aria-hidden="true" tabindex="-1"></a><span class="fu">∂</span>(complicated_function)(x)(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  6912.0
     0.0</code></pre>
 </div>
 </div>
-<div id="10" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a aria-hidden="true" tabindex="-1"></a>ε <span class="op">=</span> <span class="fl">1e-5</span></span>
-<span id="cb6-2"><a aria-hidden="true" tabindex="-1"></a>(<span class="fu">complicated_function</span>(x <span class="op">+</span> ε <span class="op">*</span> v) <span class="op">-</span> <span class="fu">complicated_function</span>(x)) <span class="op">/</span> ε</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="12" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" tabindex="-1"></a>ε <span class="op">=</span> <span class="fl">1e-5</span></span>
+<span id="cb8-2"><a aria-hidden="true" tabindex="-1"></a>(<span class="fu">complicated_function</span>(x <span class="op">+</span> ε <span class="op">*</span> v) <span class="op">-</span> <span class="fu">complicated_function</span>(x)) <span class="op">/</span> ε</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  6912.034559991297
@@ -750,14 +759,14 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <section id="a-simple-decision-tree" class="slide level2 scrollable">
 <h2>A simple decision tree</h2>
 <ol type="1">
-<li><strong>Follow recommendations</strong> of high-level library (e.g.&nbsp;Flux).</li>
-<li>Otherwise, <strong>choose best mode</strong> from input/output dimensions.</li>
+<li><strong>Follow recommendations</strong> of high-level library (e.g.&nbsp;<a href="https://github.com/FluxML/Flux.jl">Flux.jl</a>).</li>
+<li>Otherwise, <strong>choose mode</strong> from input/output dimensions.</li>
 <li>Then try the most <strong>battle-tested</strong> packages:
 <ul>
-<li><a href="https://github.com/JuliaDiff/ForwardDiff.jl">ForwardDiff</a> or <a href="https://github.com/EnzymeAD/Enzyme.jl">Enzyme</a> in forward mode,</li>
-<li><a href="https://github.com/FluxML/Zygote.jl">Zygote</a> or <a href="https://github.com/EnzymeAD/Enzyme.jl">Enzyme</a> in reverse mode.</li>
+<li><a href="https://github.com/JuliaDiff/ForwardDiff.jl">ForwardDiff.jl</a> or <a href="https://github.com/EnzymeAD/Enzyme.jl">Enzyme.jl</a> in forward mode,</li>
+<li><a href="https://github.com/FluxML/Zygote.jl">Zygote.jl</a> or <a href="https://github.com/EnzymeAD/Enzyme.jl">Enzyme.jl</a> in reverse mode.</li>
 </ul></li>
-<li>If nothing works, fall back on finite differences.</li>
+<li>If nothing works, finite differences (<span class="math inline">\(\sim\)</span> forward mode).</li>
 </ol>
 </section></section>
 <section>
@@ -770,17 +779,17 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <ul>
 <li>ForwardDiff: generic number types</li>
 <li>Zygote: no mutation</li>
-<li>Enzyme: correct annotations, type stability</li>
+<li>Enzyme: correct activity annotations, type stability (not covered here)</li>
 </ul>
 </section>
-<section id="typical-forwarddiff-misuse" class="slide level2">
-<h2>Typical ForwardDiff misuse</h2>
-<div id="12" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">ForwardDiff</span></span>
-<span id="cb8-2"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a aria-hidden="true" tabindex="-1"></a><span class="fu">badcopy</span>(x) <span class="op">=</span> <span class="fu">copyto!</span>(<span class="fu">zeros</span>(<span class="fu">size</span>(x)), x)</span>
-<span id="cb8-4"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a aria-hidden="true" tabindex="-1"></a>ForwardDiff.<span class="fu">jacobian</span>(badcopy, <span class="fu">ones</span>(<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="typical-forwarddiff-issue" class="slide level2">
+<h2>Typical ForwardDiff issue</h2>
+<div id="14" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">ForwardDiff</span></span>
+<span id="cb10-2"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a aria-hidden="true" tabindex="-1"></a><span class="fu">badcopy</span>(x) <span class="op">=</span> <span class="fu">copyto!</span>(<span class="fu">zeros</span>(<span class="fu">size</span>(x)), x)</span>
+<span id="cb10-4"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a aria-hidden="true" tabindex="-1"></a>ForwardDiff.<span class="fu">jacobian</span>(badcopy, <span class="fu">ones</span>(<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>MethodError: MethodError(Float64, (Dual{ForwardDiff.Tag{typeof(Main.Notebook.badcopy), Float64}}(1.0,1.0,0.0),), 0x0000000000007b14)
 MethodError: no method matching Float64(::ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2})
@@ -790,8 +799,8 @@ Closest candidates are:
    @ Base rounding.jl:207
   (::Type{T})(::T) where T&lt;:Number
    @ Core boot.jl:792
-  Float64(!Matched::UInt8)
-   @ Base float.jl:165
+  Float64(!Matched::IrrationalConstants.Sqrt3)
+   @ IrrationalConstants ~/.julia/packages/IrrationalConstants/vp5v4/src/macro.jl:112
   ...
 
 Stacktrace:
@@ -810,7 +819,7 @@ Stacktrace:
   [7] copyto!
     @ ./array.jl:385 [inlined]
   [8] badcopy(x::Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}})
-    @ Main.Notebook ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:320
+    @ Main.Notebook ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:327
   [9] vector_mode_dual_eval!
     @ ~/.julia/packages/ForwardDiff/PcZ48/src/apiutils.jl:24 [inlined]
  [10] vector_mode_jacobian(f::typeof(badcopy), x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2, Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}})
@@ -820,17 +829,17 @@ Stacktrace:
  [12] jacobian(f::Function, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2, Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}})
     @ ForwardDiff ~/.julia/packages/ForwardDiff/PcZ48/src/jacobian.jl:19
  [13] top-level scope
-    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:322</code></pre>
+    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:329</code></pre>
 </div>
 </div>
 </section>
 <section id="forwarddiff-troubleshooting" class="slide level2">
 <h2>ForwardDiff troubleshooting</h2>
 <p>Allow numbers of <a href="https://juliadiff.org/ForwardDiff.jl/stable/dev/how_it_works/">type <code>Dual</code></a> to pass through your functions.</p>
-<div id="14" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">goodcopy</span>(x) <span class="op">=</span> <span class="fu">copyto!</span>(<span class="fu">zeros</span>(<span class="fu">eltype</span>(x), <span class="fu">size</span>(x)), x)</span>
-<span id="cb10-2"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a aria-hidden="true" tabindex="-1"></a>ForwardDiff.<span class="fu">jacobian</span>(goodcopy, <span class="fu">ones</span>(<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="16" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">goodcopy</span>(x) <span class="op">=</span> <span class="fu">copyto!</span>(<span class="fu">zeros</span>(<span class="fu">eltype</span>(x), <span class="fu">size</span>(x)), x)</span>
+<span id="cb12-2"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a aria-hidden="true" tabindex="-1"></a>ForwardDiff.<span class="fu">jacobian</span>(goodcopy, <span class="fu">ones</span>(<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2×2 Matrix{Float64}:
  1.0  0.0
@@ -838,12 +847,12 @@ Stacktrace:
 </div>
 </div>
 </section>
-<section id="typical-zygote-misuse" class="slide level2">
-<h2>Typical Zygote misuse</h2>
-<div id="16" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">Zygote</span></span>
-<span id="cb12-2"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a aria-hidden="true" tabindex="-1"></a>Zygote.<span class="fu">jacobian</span>(badcopy, <span class="fu">ones</span>(<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="typical-zygote-issue" class="slide level2">
+<h2>Typical Zygote issue</h2>
+<div id="18" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">Zygote</span></span>
+<span id="cb14-2"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a aria-hidden="true" tabindex="-1"></a>Zygote.<span class="fu">jacobian</span>(badcopy, <span class="fu">ones</span>(<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>ErrorException: ErrorException("Mutating arrays is not supported -- called copyto!(Vector{Float64}, ...)\nThis error occurs when you ask Zygote to differentiate operations that change\nthe elements of arrays in place (e.g. setting values with x .= ...)\n\nPossible fixes:\n- avoid mutating operations (preferred)\n- or read the documentation and solutions for this error\n  https://fluxml.ai/Zygote.jl/latest/limitations\n")
 Mutating arrays is not supported -- called copyto!(Vector{Float64}, ...)
@@ -865,12 +874,12 @@ Stacktrace:
   [4] (::Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72
   [5] badcopy
-    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:320 [inlined]
-  [6] (::Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}}})(Δ::Vector{Float64})
+    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:327 [inlined]
+  [6] (::Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0
-  [7] (::Zygote.var"#294#295"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}}}})(Δ::Vector{Float64})
+  [7] (::Zygote.var"#294#295"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/lib.jl:206
-  [8] (::Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}}}}})(Δ::Vector{Float64})
+  [8] (::Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72
   [9] call_composed
     @ ./operators.jl:1045 [inlined]
@@ -880,7 +889,7 @@ Stacktrace:
     @ ./operators.jl:1044 [inlined]
  [12] #_#103
     @ ./operators.jl:1041 [inlined]
- [13] (::Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}}}}})(Δ::Vector{Float64})
+ [13] (::Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}}}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0
  [14] #294
     @ ~/.julia/packages/Zygote/NRp5C/src/lib/lib.jl:206 [inlined]
@@ -888,73 +897,38 @@ Stacktrace:
     @ ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72 [inlined]
  [16] ComposedFunction
     @ ./operators.jl:1041 [inlined]
- [17] (::Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}, Zygote.var"#2366#back#423"{Zygote.var"#pairs_namedtuple_pullback#422"{(), @NamedTuple{}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}}}}}}}}})(Δ::Vector{Float64})
+ [17] (::Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}}}}}}}, Zygote.var"#2366#back#423"{Zygote.var"#pairs_namedtuple_pullback#422"{(), @NamedTuple{}}}, Zygote.var"#2013#back#207"{typeof(identity)}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0
- [18] (::Zygote.var"#78#79"{Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}, Zygote.var"#2366#back#423"{Zygote.var"#pairs_namedtuple_pullback#422"{(), @NamedTuple{}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}}}}}}}}}})(Δ::Vector{Float64})
+ [18] (::Zygote.var"#78#79"{Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}}}}}}}, Zygote.var"#2366#back#423"{Zygote.var"#pairs_namedtuple_pullback#422"{(), @NamedTuple{}}}, Zygote.var"#2013#back#207"{typeof(identity)}}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface.jl:91
  [19] withjacobian(f::Function, args::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/grad.jl:150
  [20] jacobian(f::Function, args::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/grad.jl:128
  [21] top-level scope
-    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:348</code></pre>
+    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:355</code></pre>
 </div>
 </div>
 </section>
 <section id="zygote-troubleshooting" class="slide level2">
 <h2>Zygote troubleshooting</h2>
 <p>Define a <a href="https://juliadiff.org/ChainRulesCore.jl/stable/">custom rule</a> with <a href="https://github.com/JuliaDiff/ChainRulesCore.jl">ChainRulesCore</a>:</p>
-<div id="18" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ChainRulesCore</span>, <span class="bu">LinearAlgebra</span></span>
-<span id="cb14-2"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a aria-hidden="true" tabindex="-1"></a><span class="fu">badcopy2</span>(x) <span class="op">=</span> <span class="fu">badcopy</span>(x)</span>
-<span id="cb14-4"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> ChainRulesCore.<span class="fu">rrule</span>(<span class="op">::</span><span class="dt">typeof</span>(badcopy2), x)</span>
-<span id="cb14-6"><a aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> <span class="fu">badcopy2</span>(x)</span>
-<span id="cb14-7"><a aria-hidden="true" tabindex="-1"></a>    <span class="kw">function</span> <span class="fu">badcopy2_pullback</span>(dy)</span>
-<span id="cb14-8"><a aria-hidden="true" tabindex="-1"></a>        df, dx <span class="op">=</span> <span class="fu">NoTangent</span>(), I<span class="op">'</span> <span class="op">*</span> dy  <span class="co"># VJP</span></span>
-<span id="cb14-9"><a aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (df, dx)</span>
-<span id="cb14-10"><a aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span>
-<span id="cb14-11"><a aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> y, badcopy2_pullback</span>
-<span id="cb14-12"><a aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb14-13"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-14"><a aria-hidden="true" tabindex="-1"></a>Zygote.<span class="fu">jacobian</span>(badcopy2, <span class="fu">ones</span>(<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="20" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ChainRulesCore</span>, <span class="bu">LinearAlgebra</span></span>
+<span id="cb16-2"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a aria-hidden="true" tabindex="-1"></a><span class="fu">badcopy2</span>(x) <span class="op">=</span> <span class="fu">badcopy</span>(x)</span>
+<span id="cb16-4"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> ChainRulesCore.<span class="fu">rrule</span>(<span class="op">::</span><span class="dt">typeof</span>(badcopy2), x)</span>
+<span id="cb16-6"><a aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> <span class="fu">badcopy2</span>(x)</span>
+<span id="cb16-7"><a aria-hidden="true" tabindex="-1"></a>    <span class="fu">badcopy2_vjp</span>(dy) <span class="op">=</span> <span class="fu">NoTangent</span>(), I<span class="op">'</span> <span class="op">*</span> dy</span>
+<span id="cb16-8"><a aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> y, badcopy2_vjp</span>
+<span id="cb16-9"><a aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb16-10"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a aria-hidden="true" tabindex="-1"></a>Zygote.<span class="fu">jacobian</span>(badcopy2, <span class="fu">ones</span>(<span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>([1.0 0.0; 0.0 1.0],)</code></pre>
 </div>
 </div>
-</section>
-<section id="typical-enzyme-misuse" class="slide level2">
-<h2>Typical Enzyme misuse</h2>
-<div id="20" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">Enzyme</span></span>
-<span id="cb16-2"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a aria-hidden="true" tabindex="-1"></a>Enzyme.<span class="fu">autodiff</span>(</span>
-<span id="cb16-4"><a aria-hidden="true" tabindex="-1"></a>  Enzyme.Forward,</span>
-<span id="cb16-5"><a aria-hidden="true" tabindex="-1"></a>  badcopy,</span>
-<span id="cb16-6"><a aria-hidden="true" tabindex="-1"></a>  Enzyme.<span class="fu">Active</span>(<span class="fu">ones</span>(<span class="fl">2</span>))</span>
-<span id="cb16-7"><a aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>ErrorException: ErrorException("Unsupported Active{Vector{Float64}}, consider Duplicated or Const")
-Unsupported Active{Vector{Float64}}, consider Duplicated or Const
-Stacktrace:
- [1] error(s::String)
-   @ Base ./error.jl:35
- [2] EnzymeCore.Active(x::Vector{Float64})
-   @ EnzymeCore ~/.julia/packages/EnzymeCore/frpza/src/EnzymeCore.jl:50
- [3] top-level scope
-   @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:385</code></pre>
-</div>
-</div>
-</section>
-<section id="enzyme-troubleshooting" class="slide level2">
-<h2>Enzyme troubleshooting</h2>
-<p>Pay attention to activity annotations, type stability and temporary storage (see the <a href="https://enzymead.github.io/Enzyme.jl/stable/faq/">FAQ</a>).</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a aria-hidden="true" tabindex="-1"></a>Enzyme.<span class="fu">autodiff</span>(</span>
-<span id="cb18-2"><a aria-hidden="true" tabindex="-1"></a>  Enzyme.Forward,</span>
-<span id="cb18-3"><a aria-hidden="true" tabindex="-1"></a>  badcopy,</span>
-<span id="cb18-4"><a aria-hidden="true" tabindex="-1"></a>  Enzyme.<span class="fu">Duplicated</span>(<span class="fu">ones</span>(<span class="fl">2</span>), <span class="fu">zeros</span>(<span class="fl">2</span>))</span>
-<span id="cb18-5"><a aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section></section>
 <section>
 <section id="differentiationinterface" class="title-slide slide level1 center">
@@ -964,7 +938,7 @@ Stacktrace:
 <section id="goals" class="slide level2 scrollable">
 <h2>Goals</h2>
 <ul>
-<li><a href="https://github.com/gdalle/DifferentiationInterface.jl">DifferentiationInterface</a> (DI) offers a <strong>common syntax</strong> for all AD packages<sup>1</sup></li>
+<li><a href="https://github.com/JuliaDiff/DifferentiationInterface.jl">DifferentiationInterface.jl</a> (DI) offers a <strong>common syntax</strong> for all AD packages<sup>1</sup></li>
 <li>AD users can compare correctness and performance <strong>without reading each documentation</strong></li>
 </ul>
 <div class="callout callout-warning callout-titled callout-style-default">
@@ -976,33 +950,32 @@ Stacktrace:
 <p><strong>The fine print</strong></p>
 </div>
 <div class="callout-content">
-<p>DI may be slower than a direct call to the backend’s API (mostly with Enzyme).</p>
+<p>DI may be slower than a direct call to the package’s API (mostly with Enzyme).</p>
 </div>
 </div>
 </div>
-<aside><ol class="aside-footnotes"><li id="fn3"><p>inspired by <a href="https://github.com/JuliaDiff/AbstractDifferentiation.jl">AbstractDifferentiation</a></p></li></ol></aside></section>
+<aside><ol class="aside-footnotes"><li id="fn3"><p>inspired by <a href="https://github.com/JuliaDiff/AbstractDifferentiation.jl">AbstractDifferentiation.jl</a></p></li></ol></aside></section>
 <section id="supported-packages" class="slide level2">
 <h2>Supported packages</h2>
-<!-- Using columns to fit everything on one slide -->
 <div class="columns">
 <div class="column" style="width:50%;">
 <ul>
-<li><a href="https://github.com/JuliaDiff/ChainRulesCore.jl">ChainRulesCore</a></li>
-<li><a href="https://github.com/JuliaDiff/Diffractor.jl">Diffractor</a></li>
-<li><a href="https://github.com/EnzymeAD/Enzyme.jl">Enzyme</a></li>
-<li><a href="https://github.com/brianguenter/FastDifferentiation.jl">FastDifferentiation</a></li>
-<li><a href="https://github.com/JuliaDiff/FiniteDiff.jl">FiniteDiff</a></li>
-<li><a href="https://github.com/JuliaDiff/FiniteDifferences.jl">FiniteDifferences</a></li>
-<li><a href="https://github.com/JuliaDiff/ForwardDiff.jl">ForwardDiff</a></li>
+<li><a href="https://github.com/JuliaDiff/ChainRulesCore.jl">ChainRulesCore.jl</a></li>
+<li><a href="https://github.com/JuliaDiff/Diffractor.jl">Diffractor.jl</a></li>
+<li><a href="https://github.com/EnzymeAD/Enzyme.jl">Enzyme.jl</a></li>
+<li><a href="https://github.com/brianguenter/FastDifferentiation.jl">FastDifferentiation.jl</a></li>
+<li><a href="https://github.com/JuliaDiff/FiniteDiff.jl">FiniteDiff.jl</a></li>
+<li><a href="https://github.com/JuliaDiff/FiniteDifferences.jl">FiniteDifferences.jl</a></li>
+<li><a href="https://github.com/JuliaDiff/ForwardDiff.jl">ForwardDiff.jl</a></li>
 </ul>
 </div><div class="column" style="width:50%;">
 <ul>
-<li><a href="https://github.com/JuliaDiff/PolyesterForwardDiff.jl">PolyesterForwardDiff</a></li>
-<li><a href="https://github.com/JuliaDiff/ReverseDiff.jl">ReverseDiff</a></li>
-<li><a href="https://github.com/JuliaSymbolics/Symbolics.jl">Symbolics</a></li>
-<li><a href="https://github.com/compintell/Mooncake.jl">Mooncake</a></li>
-<li><a href="https://github.com/FluxML/Tracker.jl">Tracker</a></li>
-<li><a href="https://github.com/FluxML/Zygote.jl">Zygote</a></li>
+<li><a href="https://github.com/JuliaDiff/PolyesterForwardDiff.jl">PolyesterForwardDiff.jl</a></li>
+<li><a href="https://github.com/JuliaDiff/ReverseDiff.jl">ReverseDiff.jl</a></li>
+<li><a href="https://github.com/JuliaSymbolics/Symbolics.jl">Symbolics.jl</a></li>
+<li><a href="https://github.com/compintell/Mooncake.jl">Mooncake.jl</a></li>
+<li><a href="https://github.com/FluxML/Tracker.jl">Tracker.jl</a></li>
+<li><a href="https://github.com/FluxML/Zygote.jl">Zygote.jl</a></li>
 </ul>
 </div></div>
 </section>
@@ -1012,27 +985,27 @@ Stacktrace:
 <li>Load the necessary packages</li>
 </ol>
 <div id="22" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DifferentiationInterface;</span> import ForwardDiff, <span class="bu">Enzyme</span>, <span class="bu">Zygote</span></span>
-<span id="cb19-2"><a aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">sum</span>(abs2, x)</span>
-<span id="cb19-3"><a aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">4.0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DifferentiationInterface;</span> import ForwardDiff, <span class="bu">Enzyme</span>, <span class="bu">Zygote</span></span>
+<span id="cb18-2"><a aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">sum</span>(abs2, x)</span>
+<span id="cb18-3"><a aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">4.0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ol start="2" type="1">
-<li>Combine one of DI’s operators with a backend from <a href="https://github.com/SciML/ADTypes.jl">ADTypes</a></li>
+<li>Use one of DI’s operators with a backend from <a href="https://github.com/SciML/ADTypes.jl">ADTypes.jl</a></li>
 </ol>
 <div id="24" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">value_and_gradient</span>(f, <span class="fu">AutoForwardDiff</span>(), x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">value_and_gradient</span>(f, <span class="fu">AutoForwardDiff</span>(), x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(30.0, [2.0, 4.0, 6.0, 8.0])</code></pre>
 </div>
 </div>
 <div id="26" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">value_and_gradient</span>(f, <span class="fu">AutoEnzyme</span>(), x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">value_and_gradient</span>(f, <span class="fu">AutoEnzyme</span>(), x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(30.0, [2.0, 4.0, 6.0, 8.0])</code></pre>
 </div>
 </div>
 <div id="28" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">value_and_gradient</span>(f, <span class="fu">AutoZygote</span>(), x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">value_and_gradient</span>(f, <span class="fu">AutoZygote</span>(), x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(30.0, [2.0, 4.0, 6.0, 8.0])</code></pre>
 </div>
@@ -1060,11 +1033,11 @@ Stacktrace:
 <h1>Sparsity</h1>
 
 </section>
-<section id="compressed-evaluation" class="slide level2 scrollable">
-<h2>Compressed evaluation</h2>
-<p>If two columns don’t overlap:</p>
+<section id="compressed-differentiation" class="slide level2 scrollable">
+<h2>Compressed differentiation</h2>
+<p>If two Jacobian columns don’t overlap:</p>
 <ol type="1">
-<li>evaluate their sum in one JVP</li>
+<li>evaluate their sum in 1 JVP instead of 2</li>
 <li>redistribute the nonzero coefficients.</li>
 </ol>
 <p><span class="math display">\[J = \begin{pmatrix}
@@ -1074,42 +1047,66 @@ Stacktrace:
 \cdot &amp; 4 &amp; 8
 \end{pmatrix} \quad \implies \quad J(e_1 + e_2) \text{ and } J e_3\]</span></p>
 </section>
-<section id="how-many-jvps" class="slide level2">
-<h2>How many JVPs?</h2>
-<p>Efficient grouping of non-overlapping columns = graph coloring problem.</p>
+<section id="prerequisite-1-pattern-detection" class="slide level2">
+<h2>Prerequisite 1: pattern detection</h2>
+<p>Find which coefficients <em>might</em> be nonzero.</p>
+<div class="columns">
+<div class="column" style="width:40%;">
 <div id="30" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">SparseMatrixColorings</span>, <span class="bu">SparseArrays</span>, <span class="bu">Images</span></span>
-<span id="cb26-2"><a aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="fu">spdiagm</span>(<span class="fl">0</span> <span class="op">=&gt;</span> <span class="fu">ones</span>(<span class="dt">Bool</span>, <span class="fl">10</span>), <span class="op">-</span><span class="fl">1</span> <span class="op">=&gt;</span> <span class="fu">ones</span>(<span class="dt">Bool</span>, <span class="fl">9</span>), <span class="op">+</span><span class="fl">1</span> <span class="op">=&gt;</span> <span class="fu">ones</span>(<span class="dt">Bool</span>, <span class="fl">9</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>10×10 SparseMatrixCSC{Bool, Int64} with 28 stored entries:
- 1  1  ⋅  ⋅  ⋅  ⋅  ⋅  ⋅  ⋅  ⋅
- 1  1  1  ⋅  ⋅  ⋅  ⋅  ⋅  ⋅  ⋅
- ⋅  1  1  1  ⋅  ⋅  ⋅  ⋅  ⋅  ⋅
- ⋅  ⋅  1  1  1  ⋅  ⋅  ⋅  ⋅  ⋅
- ⋅  ⋅  ⋅  1  1  1  ⋅  ⋅  ⋅  ⋅
- ⋅  ⋅  ⋅  ⋅  1  1  1  ⋅  ⋅  ⋅
- ⋅  ⋅  ⋅  ⋅  ⋅  1  1  1  ⋅  ⋅
- ⋅  ⋅  ⋅  ⋅  ⋅  ⋅  1  1  1  ⋅
- ⋅  ⋅  ⋅  ⋅  ⋅  ⋅  ⋅  1  1  1
- ⋅  ⋅  ⋅  ⋅  ⋅  ⋅  ⋅  ⋅  1  1</code></pre>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> T <span class="op">&lt;:</span><span class="dt"> Real  </span><span class="co"># tracer</span></span>
+<span id="cb25-2"><a aria-hidden="true" tabindex="-1"></a>    set<span class="op">::</span><span class="dt">Set{Int}</span></span>
+<span id="cb25-3"><a aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
+</div><div class="column" style="width:60%;">
 <div id="32" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="fu">coloring</span>(J, <span class="fu">ColoringProblem</span><span class="dt">{:nonsymmetric,:column}</span>(), <span class="fu">GreedyColoringAlgorithm</span>())</span>
-<span id="cb28-2"><a aria-hidden="true" tabindex="-1"></a><span class="fu">column_colors</span>(result)<span class="ch">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a aria-hidden="true" tabindex="-1"></a><span class="bu">Base</span>.<span class="op">:</span><span class="fu">+</span>(a<span class="op">::</span><span class="dt">T</span>, b<span class="op">::</span><span class="dt">T</span>) <span class="op">=</span> <span class="fu">T</span>(a.set <span class="op">∪</span> b.set)</span>
+<span id="cb26-2"><a aria-hidden="true" tabindex="-1"></a><span class="bu">Base</span>.<span class="op">:</span><span class="fu">*</span>(a<span class="op">::</span><span class="dt">T</span>, b<span class="op">::</span><span class="dt">T</span>) <span class="op">=</span> <span class="fu">T</span>(a.set <span class="op">∪</span> b.set)</span>
+<span id="cb26-3"><a aria-hidden="true" tabindex="-1"></a><span class="bu">Base</span>.<span class="fu">sign</span>(x<span class="op">::</span><span class="dt">T</span>) <span class="op">=</span> <span class="fu">T</span>(<span class="fu">Set</span><span class="dt">{Int}</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div></div>
+<p>Trace dependencies on inputs during function execution.</p>
+<div id="34" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x[<span class="fl">1</span>] <span class="op">+</span> <span class="fu">sign</span>(x[<span class="fl">2</span>]) <span class="op">*</span> x[<span class="fl">3</span>]</span>
+<span id="cb27-2"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a aria-hidden="true" tabindex="-1"></a>xt <span class="op">=</span> <span class="fu">T</span>.([<span class="fu">Set</span>(<span class="fl">1</span>), <span class="fu">Set</span>(<span class="fl">2</span>), <span class="fu">Set</span>(<span class="fl">3</span>)])</span>
+<span id="cb27-4"><a aria-hidden="true" tabindex="-1"></a>yt <span class="op">=</span> <span class="fu">f</span>(xt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>1×10 adjoint(::Vector{Int64}) with eltype Int64:
- 1  2  3  1  2  3  1  2  3  1</code></pre>
+<pre><code>T(Set([3, 1]))</code></pre>
 </div>
 </div>
+</section>
+<section id="prerequisite-2-pattern-coloring" class="slide level2">
+<h2>Prerequisite 2: pattern coloring</h2>
+<p>Split columns into non-overlapping groups.</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div id="38" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">SparseArrays</span></span>
+<span id="cb29-2"><a aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="fu">sprand</span>(<span class="fl">30</span>, <span class="fl">30</span>, <span class="fl">0.2</span>)</span>
+<span id="cb29-3"><a aria-hidden="true" tabindex="-1"></a><span class="fu">show_colors</span>(J; scale<span class="op">=</span><span class="fl">10</span>, pad<span class="op">=</span><span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWoAAAFqCAIAAAC8uoe0AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAADe5JREFUeAHtwU9rk/n7sOFzcb0JkSJqQZhVYBYlUOg/itZNkaTvIO226xsKUhDutduad2DDkI22iKYBobgQuhIGbMsQhnkZ3wdm//klz2UmJO15HPG///0PSfr/F0hSSvCvaqmmrB5VLKb1zhVlF90G86fTe0dZt7UPVB9fU1bvHHO/ff30nLLV7XNgY+2SssGwicYJJCklkKSUQJJSAklKCSQpJZCklECSUgJJSgkkKSX4Vz2quIsuug0WTbe1zzj1zjEqW90+Z5zBsIl+TSBJKcHEqqWasnpUoWno9N5R1m3tMz1vPx9Qdrh1wmTef2lRtrfZY3pevPlG2dnRCpPZWLukbDBsMn/+PmlS9vDgkun5+eQpZcs310AgSSmBJKUEkpQSSFJKIEkpgSSlBJKUEkhSSiBJKcHE6lGF/nvd1j6zcrh1wjTsbfaYlbOjFaZhMGyyaB4eXDIryzfXjBNIUkpwp613rii76DZYTNXH15TVO8fAizffKDs7WgHefj6g7HDrhMm8/9KibG+zh8b58481yp69GjJ/AklKCSQpJZCklECSUgJJSgkkKSWQpJRAklICSUoJ7rSLboO7qN45ZpyzoxXGOdw6YRr2Nnvo1zx7NWTRBJKUEkysWqopq0cV99uLN98oOztaAdrdD5Sddl4ymerja8rqnWMm8/bzAWWHWyfcXRtrl5QNhk1m688/1ih79mrIZP6pfqfsQf2d6QkkKSWQpJRAklICSUoJJCklkKSUQJJSAklKCSQpJZhYPapQ2dnRCuOcdl4yDfXOMdNwuHXCfTUYNpknz14NmYYH9XdmJZCklGBi1VJNWT2qmK2NtUvKBsMm0t3y90mTsocHl8A/1e+UPai/A3/t/kbZo/4P4OeTp5Qt31wDgSSlBJKUEkhSSiBJKYEkpQSSlBJIUkogSSmBJKUEE6tHFfNkMGwi3ScPDy4Z50H9nXEe9X8wzvLNNeMEkpQSzKXdx6eU9W/b6C7q9N5R1m3tc7/9fdKk7OHBJbMVSFJKIEkpgSSlBJKUEkhSSiBJKYEkpQSSlBJIUkowl/q3bXT/dFv7qOzhwSXzJJCklGDmdh+fUta/bTN/NtYuKRsMm0ym3f1A2WnnJbP19vMBZYdbJ0zm/ZcWZXubPWC9c0XZRbfB/Kk+vqas3jnmfgskKSWQpJRAklICSUoJJCklkKSUQJJSAklKCSQpJZi5/m2bRTMYNpmG085L5snh1gnTsLfZY5yLboNFU+8co7JAklKCiVVLNWX1qGJ6dh+fUta/bQMba5eUDYZNYL1zRdlFt8H0vHjzjbKzoxU0Tqf3jrJuax/Nk0CSUgJJSgkkKSWQpJRAklICSUoJJCklkKSUQJJSgonVo4pZ6d+2GWcwbDLORbfBrJwdraBf023to8URSFJKMLFqqaasHlVMz+7jU8r6t23mz4s33yg7O1rh7nr/pUXZ3mYPWO9cUXbRbQCd3jvKuq19NCs/nzylbPnmGggkKSWQpJRAklICSUoJJCklkKSUQJJSAklKCSQpJZhYPaqYlf5tm0VzdrTCfbW32WOci26DcbqtfTQflm+uGSeQpJRgqqqlmrJ6VLGYNtYuKRsMm0ym3f1A2WnnJYvp/ZcWZXubPWbr66fnlK1unzN//vxjjbJnr4ZMz1+7v1H2qP+DyQSSlBJIUkogSSmBJKUEkpQSSFJKIEkpgSSlBJKUEkxVPaq4iwbDJtNw2nnJXbS32WOerG6fs2ievRoyK4/6P5iGQJJSgqmqlmrK6lHFbK13rii76DaA3cenlPVv28DG2iVlg2GT+fPizTfKzo5WuLu+fnpO2er2OXfXP9XvlD2ovzOZn0+eUrZ8cw0EkpQSSFJKIEkpgSSlBJKUEkhSSiBJKYEkpQSSlBJMVT2qmCcX3Qbj9G/bjDMYNlk0Z0cr3Fer2+fcVw/q70zD8s014wSSlBIsrI21S8oGwyaT2X18Sln/to3Gef+lRdneZg9Y71xRdtFtoEUTSFJKIEkpgSSlBJKUEkhSSiBJKYEkpQSSlBJIUkqwsAbDJtPQv22jX7O32WOci24D3S2BJKUE0r20sXZJ2WDYZLb+/GONsmevhsDfJ03KHh5cMluBJKUEkpQSSFJKIEkpgSSlBJKUEkhSSiBJKYEkpQTSvTQYNpknz14NGefhwSXzJJCklED6P613rii76DaYP18/Padsdfuc2aqWasrqUcVk/j5pUvbw4JLJ/LX7G2WP+j+YTCBJKYEkpQSSlBJIUkogSSmBJKUEkpQSSFJKIEkpgfR/uug2WDSr2+fMk3pUMQ0PDy6Zhkf9H0xDIEkpwcSqpZqyelShcdrdD5Sddl4yPS/efKPs7GgFzZM//1ij7NmrIZP5p/qdsgf1d6YnkKSUQJJSAklKCSQpJZCklECSUgJJSgkkKSWQpJRgYvWoQr/mtPOSWTk7WkGL49mrIdPwoP7OrASSlBLMpd3Hp5T1b9vAxtolZYNhE43z9vMBZYdbJ0zm/ZcWZXubPWC9c0XZRbfB3VUt1ZTVowr48481yp69GjI9f+3+Rtmj/g8mE0hSSiBJKYEkpQSSlBJIUkogSSmBJKUEkpQSSFJKMJf6t23GGQyb6Nccbp0wDXubPca56Da4r+pRxTjPXg2ZlUf9H0xDIEkpwb+qpZqyelQhLY6vn55Ttrp9jqYhkKSUQJJSAklKCSQpJZCklECSUgJJSgkkKSWQpJTgX/WoQrorVrfP0X8vkKSUYGLVUk1ZPaqYnt3Hp5T1b9vM1sbaJWWDYZO7a71zRdlFt8H0dHrvKOu29tE4/1S/U/ag/s70BJKUEkhSSiBJKYEkpQSSlBJIUkogSSmBJKUEkpQSTKweVcxK/7bNPBkMm9xXF90Gs9Jt7aNf86D+zqwEkpQSzKXdx6eU9W/bzNbG2iVlg2ETePHmG2VnRyvcXe+/tCjb2+xxv1VLNWX1qGIxBZKUEkhSSiBJKYEkpQSSlBJIUkogSSmBJKUEkpQSzKX+bZt5Mhg2GefsaIX7am+zh8rqUcVdFEhSSvCvaqmmrB5VaFY6vXeUdVv7TM/bzweUHW6dMJn3X1qU7W32gPXOFWUX3QaLqfr4mrJ655jZ+qf6nbIH9Xcm8/PJU8qWb66BQJJSAklKCSQpJZCklECSUgJJSgkkKSWQpJRAklKCf9WjCs2HbmufWTncOmEa9jZ7jHPRbXAX1TvHzJMH9XemYfnmmnECSUoJJlYt1ZTVo4rZ2li7pGwwbALrnSvKLroNYPfxKWX92zbzp/r4mrJ655jJvP18QNnh1gnz58Wbb5SdHa1wd/190qTs4cElsxVIUkogSSmBJKUEkpQSSFJKIEkpgSSlBJKUEkhSSjCxelQxTwbDJuNcdBuM079ts2jqnWOm4XDrhEVzdrTCffXw4JJ5EkhSSqAJbKxdUjYYNplMu/uBstPOS6bnxZtvlJ0drTB/Or13lHVb+8xW9fE1ZfXOMfPnn+p3yh7U34G/dn+j7FH/B/DzyVPKlm+ugUCSUgJJSgkkKSWQpJRAklICSUoJJCklkKSUQJJSAk1gMGwyDaedl8zK2dEKi6bb2mee1DvHLJoH9XfGedT/wTjLN9eME0hSSnCnrXeuKLvoNpitdvcDZaedl8zW288HlB1unTCZ919alO1t9pitr5+eU7a6fc5sVUs1ZfWoYjJ/nzQpe3hwyfT8fPKUsuWbayCQpJRAklICSUoJJCklkKSUQJJSAklKCSQpJZCklOBOu+g2mCennZfMk8OtE6Zhb7PHPFndPmee1KOKaXh4cMmsLN9cM04gSSmB5kyn946ybmuf++3Fm2+UnR2tAF8/Padsdfuc2aqWasrqUQX8+ccaZc9eDZmtn0+eUrZ8cw0EkpQSSFJKIEkpgSSlBJKUEkhSSiBJKYEkpQSSlBJoznRb+6js7GiFcVa3z5kn9ahinGevhsyT5ZtrxgkkKSXQDLW7Hyg77bxE0/D103PKVrfP0Tg/nzylbPnmGggkKSWQpJRAklICSUoJJCklkKSUQJJSAklKCSQpJdAMnXZeov/e6vY5+jXLN9eME0hSSnDv7T4+pax/20bTsN65ouyi22C2NtYuKRsMm0ym+viasnrnmLsrkKSUQJJSAklKCSQpJZCklECSUgJJSgkkKSWQpJTg3uvfttF/76LbYJ4Mhk2mod455r4KJCkluNPWO1eUXXQbaBref2lRtrfZ436rlmrK6lHFYgokKSWQpJRAklICSUoJJCklkKSUQJJSAklKCSQpJbjTLroN9N/b2+yhsnpUcRcFkpQSTKxaqimrRxWT2X18Sln/ts1ievHmG2VnRytAu/uBstPOS6DTe0dZt7XP/Hn/pUXZ3maPu6v6+JqyeueYuyuQpJRAklICSUoJJCklkKSUQJJSAklKCSQpJZCklGBi9ahiGvq3be6is6MVxjntvGScbmufRbO32eO+qneOua8CSUoJpqpaqimrRxWLaWPtkrLBsAm8ePONsrOjFSbT6b2jrNvaR7NSfXxNWb1zzGL6a/c3yh71fzCZQJJSAklKCSQpJZCklECSUgJJSgkkKSWQpJRAklKCqapHFXfRYNhknLOjFaah29pH86HeOeYuetT/wTQEkpQSaAFVH19TVu8cM5m3nw8oO9w6YXrWO1eUXXQbTM/XT88pW90+BzbWLikbDJtonECSUgJJSgkkKSWQpJRAklICSUoJJCklkKSUQJJSAi2geueYaTjcOmFWLroNZmV1+5xxBsMm+jWBJKX8PwrtJV3hWGYMAAAAAElFTkSuQmCC">
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div id="40" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">BandedMatrices</span></span>
+<span id="cb30-2"><a aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="fu">brand</span>(<span class="fl">30</span>, <span class="fl">30</span>, <span class="fl">3</span>, <span class="fl">3</span>)</span>
+<span id="cb30-3"><a aria-hidden="true" tabindex="-1"></a><span class="fu">show_colors</span>(J; scale<span class="op">=</span><span class="fl">10</span>, pad<span class="op">=</span><span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<img src="data:image/png;base64,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">
+</div>
+</div>
+</div></div>
 </section>
 <section id="new-sparse-ad-ecosystem" class="slide level2">
 <h2>New sparse AD ecosystem</h2>
 <ul>
-<li><a href="https://github.com/adrhill/SparseConnectivityTracer.jl">SparseConnectivityTracer</a> for sparsity pattern detection</li>
-<li><a href="https://github.com/gdalle/SparseMatrixColorings.jl">SparseMatrixColorings</a> for matrix coloring and decompression</li>
-<li>DifferentiationInterface for compressed differentiation</li>
+<li><a href="https://github.com/adrhill/SparseConnectivityTracer.jl">SparseConnectivityTracer.jl</a>: pattern detection</li>
+<li><a href="https://github.com/gdalle/SparseMatrixColorings.jl">SparseMatrixColorings.jl</a>: coloring and decompression</li>
+<li><a href="https://github.com/JuliaDiff/DifferentiationInterface.jl">DifferentiationInterface.jl</a>: compressed differentiation</li>
 </ul>
+<p>Already used by <a href="https://github.com/SciML">SciML</a> and <a href="https://github.com/JuliaSmoothOptimizers">JuliaSmoothOptimizers</a>.</p>
 </section></section>
 <section>
 <section id="conclusion" class="title-slide slide level1 center">
@@ -1127,8 +1124,9 @@ Stacktrace:
 </section>
 <section id="take-home-message" class="slide level2">
 <h2>Take-home message</h2>
-<p><strong>Computing derivatives is easy</strong>, but each AD solution comes with its own <strong>limitations</strong>.</p>
-<p>Learn to recognize and overcome them, either as a user or as a developer.</p>
+<p>Computing derivatives is <strong>automatic</strong> and efficient.</p>
+<p>Each AD system comes with <strong>limitations</strong>.</p>
+<p>Learn to recognize and overcome them.</p>
 </section>
 <section id="references" class="slide level2 smaller scrollable">
 <h2>References</h2>
