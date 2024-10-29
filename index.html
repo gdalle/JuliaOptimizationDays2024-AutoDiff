@@ -468,6 +468,11 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <h1>Introduction</h1>
 
 </section>
+<section id="slides" class="slide level2">
+<h2>Slides</h2>
+<p><a href="https://gdalle.github.io/JuliaOptimizationDays2024-AutoDiff/" class="uri">https://gdalle.github.io/JuliaOptimizationDays2024-AutoDiff/</a></p>
+
+<img data-src="https://i.imgur.com/Nxt5Ft6.png" class="r-stretch"></section>
 <section id="motivation" class="slide level2">
 <h2>Motivation</h2>
 <div class="callout callout-note callout-titled callout-style-default">
@@ -529,15 +534,15 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <p>In other words,</p>
 <p><span class="math display">\[\partial f(x)[v] = \lim_{\varepsilon \to 0} \frac{f(x + \varepsilon v) - f(x)}{\varepsilon}\]</span></p>
 </section>
-<section id="various-flavors-of-differentiation" class="slide level2">
+<section id="various-flavors-of-differentiation" class="slide level2 scrollable">
 <h2>Various flavors of differentiation</h2>
 <ul>
 <li><strong>Manual</strong>: work out <span class="math inline">\(\partial f\)</span> by hand</li>
 <li><strong>Numeric</strong>: <span class="math inline">\(\partial f(x)[v] \approx \frac{f(x+\varepsilon v) - f(x)}{\varepsilon}\)</span></li>
 <li><strong>Symbolic</strong>: enter a formula for <span class="math inline">\(f\)</span>, get a formula for <span class="math inline">\(\partial f\)</span></li>
-<li><strong>Automatic</strong>: code a program for <span class="math inline">\(f\)</span>, get a program for <span class="math inline">\(\partial f(x)\)</span></li>
+<li><strong>Automatic</strong><sup>1</sup>: code a program for <span class="math inline">\(f\)</span>, get a program for <span class="math inline">\(\partial f(x)\)</span></li>
 </ul>
-</section>
+<aside><ol class="aside-footnotes"><li id="fn1"><p>or algorithmic</p></li></ol></aside></section>
 <section id="two-ingredients-of-ad" class="slide level2 scrollable">
 <h2>Two ingredients of AD</h2>
 <p>Any derivative can be obtained from:</p>
@@ -548,7 +553,7 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <p><span class="math display">\[\partial (f \circ g)(x) = \partial f(g(x)) \circ \partial g(x)\]</span></p>
 <p>or its adjoint<sup>1</sup></p>
 <p><span class="math display">\[\partial (f \circ g)^*(x) = \partial g(x)^* \circ \partial f(g(x))^*\]</span></p>
-<aside><ol class="aside-footnotes"><li id="fn1"><p>the “transpose” of a linear map</p></li></ol></aside></section>
+<aside><ol class="aside-footnotes"><li id="fn2"><p>the “transpose” of a linear map</p></li></ol></aside></section>
 <section id="homemade-ad-1" class="slide level2">
 <h2>Homemade AD (1)</h2>
 <p>Basic functions</p>
@@ -573,13 +578,13 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <p>Let’s try it out</p>
 <div id="8" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a aria-hidden="true" tabindex="-1"></a>complicated_function <span class="op">=</span> square <span class="op">∘</span> double <span class="op">∘</span> square <span class="op">∘</span> double</span>
-<span id="cb4-2"><a aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="fl">3</span>, <span class="fl">5</span>]</span>
-<span id="cb4-3"><a aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> [<span class="fl">1</span>, <span class="fl">2</span>];</span>
+<span id="cb4-2"><a aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="fl">3.0</span>, <span class="fl">5.0</span>]</span>
+<span id="cb4-3"><a aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">0.0</span>];</span>
 <span id="cb4-4"><a aria-hidden="true" tabindex="-1"></a><span class="fu">∂</span>(complicated_function)(x)(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>2-element Vector{Int64}:
-  6912
- 64000</code></pre>
+<pre><code>2-element Vector{Float64}:
+ 6912.0
+    0.0</code></pre>
 </div>
 </div>
 <div id="10" class="cell" data-execution_count="1">
@@ -587,8 +592,8 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <span id="cb6-2"><a aria-hidden="true" tabindex="-1"></a>(<span class="fu">complicated_function</span>(x <span class="op">+</span> ε <span class="op">*</span> v) <span class="op">-</span> <span class="fu">complicated_function</span>(x)) <span class="op">/</span> ε</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
-  6912.034559991297
- 64000.384000974</code></pre>
+ 6912.034559991297
+    0.0</code></pre>
 </div>
 </div>
 </section>
@@ -631,9 +636,24 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <p><span class="math display">\[((\underbrace{(\underbrace{w^\top J_L}_{w_L}) J_{L-1}}_{w_{L-1}} \dots ) J_2 ) J_1\]</span></p>
 <p>Reverse mode AD relies on the adjoint chain rule.</p>
 </section>
-<section id="computational-complexity" class="slide level2">
-<h2>Computational complexity</h2>
-<p>Consider <span class="math inline">\(f : \mathbb{R}^n \to \mathbb{R}^m\)</span>. How much does its Jacobian cost?</p>
+<section id="jacobian-matrices-are-back" class="slide level2">
+<h2>Jacobian matrices are back</h2>
+<p>Consider <span class="math inline">\(f : \mathbb{R}^n \to \mathbb{R}^m\)</span>. How to recover the full Jacobian?</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Forward mode</strong></p>
+<p>Column by column:</p>
+<p><span class="math display">\[J = \begin{pmatrix} J e_1 &amp; \dots &amp; J e_n \end{pmatrix}\]</span></p>
+<p>where <span class="math inline">\(e_i\)</span> is a basis vector.</p>
+</div><div class="column" style="width:50%;">
+<p><strong>Reverse mode</strong></p>
+<p>Row by row:</p>
+<p><span class="math display">\[J = \begin{pmatrix} e_1^\top J \\ \vdots \\ e_m^\top J \end{pmatrix}\]</span></p>
+</div></div>
+</section>
+<section id="complexities" class="slide level2">
+<h2>Complexities</h2>
+<p>Consider <span class="math inline">\(f : \mathbb{R}^n \to \mathbb{R}^m\)</span>. How much does a Jacobian cost?</p>
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -647,16 +667,41 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 </div>
 </div>
 </div>
-<div class="columns">
-<div class="column" style="width:50%;">
-<p><strong>Forward mode</strong></p>
-<p>Column by column: <span class="math inline">\(O(n)\)</span></p>
-<p><span class="math display">\[J = \begin{pmatrix} J e_1 &amp; \dots &amp; J e_n \end{pmatrix}\]</span></p>
-</div><div class="column" style="width:50%;">
-<p><strong>Reverse mode</strong></p>
-<p>Row by row: <span class="math inline">\(O(m)\)</span></p>
-<p><span class="math display">\[J = \begin{pmatrix} e_1^\top J \\ \dots \\ e_m^\top J \end{pmatrix}\]</span></p>
-</div></div>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>sizes</th>
+<th>jacobian</th>
+<th>forward</th>
+<th>reverse</th>
+<th>best mode</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>generic</td>
+<td>jacobian</td>
+<td><span class="math inline">\(O(n)\)</span></td>
+<td><span class="math inline">\(O(m)\)</span></td>
+<td>depends</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(n = 1\)</span></td>
+<td>derivative</td>
+<td><span class="math inline">\(O(1)\)</span></td>
+<td><span class="math inline">\(O(m)\)</span></td>
+<td>forward</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(m = 1\)</span></td>
+<td>gradient</td>
+<td><span class="math inline">\(O(n)\)</span></td>
+<td><span class="math inline">\(O(1)\)</span></td>
+<td>reverse</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fast reverse mode gradients make deep learning possible.</strong></p>
 </section></section>
 <section>
 <section id="using-ad" class="title-slide slide level1 center">
@@ -681,8 +726,8 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 
 <img data-src="img/python_julia_dev.png" class="r-stretch"><p>Image: courtesy of Adrian Hill</p>
 </section>
-<section id="why-so-many-backends" class="slide level2">
-<h2>Why so many backends?</h2>
+<section id="why-so-many-packages" class="slide level2">
+<h2>Why so many packages?</h2>
 <ul>
 <li>Conflicting <strong>paradigms</strong>:
 <ul>
@@ -692,12 +737,12 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <li>Cover varying <strong>subsets of the language</strong></li>
 <li>Historical reasons: developed by <strong>different people</strong></li>
 </ul>
-<p>Exhaustive list available at <a href="https://juliadiff.org/" class="uri">https://juliadiff.org/</a>.</p>
+<p>Full list available at <a href="https://juliadiff.org/" class="uri">https://juliadiff.org/</a>.</p>
 </section>
 <section id="meaningful-criteria" class="slide level2">
 <h2>Meaningful criteria</h2>
 <ul>
-<li>Does this AD backend <strong>execute</strong> <strong>without error</strong>?</li>
+<li>Does this AD package <strong>execute</strong> <strong>without error</strong>?</li>
 <li>Does it return the <strong>right derivative</strong>?</li>
 <li>Does it run <strong>fast enough</strong> for me?</li>
 </ul>
@@ -706,8 +751,8 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <h2>A simple decision tree</h2>
 <ol type="1">
 <li><strong>Follow recommendations</strong> of high-level library (e.g.&nbsp;Flux).</li>
-<li>Otherwise, <strong>choose mode</strong> from input/output dimensions.</li>
-<li>Try the most <strong>battle-tested</strong> backends:
+<li>Otherwise, <strong>choose best mode</strong> from input/output dimensions.</li>
+<li>Then try the most <strong>battle-tested</strong> packages:
 <ul>
 <li><a href="https://github.com/JuliaDiff/ForwardDiff.jl">ForwardDiff</a> or <a href="https://github.com/EnzymeAD/Enzyme.jl">Enzyme</a> in forward mode,</li>
 <li><a href="https://github.com/FluxML/Zygote.jl">Zygote</a> or <a href="https://github.com/EnzymeAD/Enzyme.jl">Enzyme</a> in reverse mode.</li>
@@ -720,8 +765,8 @@ Adrian Hill <a href="https://orcid.org/0009-0009-5977-301X" class="quarto-title-
 <h1>Enabling AD</h1>
 
 </section>
-<section id="each-backend-has-demands" class="slide level2">
-<h2>Each backend has demands</h2>
+<section id="each-package-has-demands" class="slide level2">
+<h2>Each package has demands</h2>
 <ul>
 <li>ForwardDiff: generic number types</li>
 <li>Zygote: no mutation</li>
@@ -745,7 +790,7 @@ Closest candidates are:
    @ Base rounding.jl:207
   (::Type{T})(::T) where T&lt;:Number
    @ Core boot.jl:792
-  Float64(!Matched::IrrationalConstants.Halfπ)
+  Float64(!Matched::IrrationalConstants.Twoinvπ)
    @ IrrationalConstants ~/.julia/packages/IrrationalConstants/vp5v4/src/macro.jl:112
   ...
 
@@ -765,7 +810,7 @@ Stacktrace:
   [7] copyto!
     @ ./array.jl:385 [inlined]
   [8] badcopy(x::Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}})
-    @ Main.Notebook ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:298
+    @ Main.Notebook ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:320
   [9] vector_mode_dual_eval!
     @ ~/.julia/packages/ForwardDiff/PcZ48/src/apiutils.jl:24 [inlined]
  [10] vector_mode_jacobian(f::typeof(badcopy), x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2, Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}})
@@ -775,7 +820,7 @@ Stacktrace:
  [12] jacobian(f::Function, x::Vector{Float64}, cfg::ForwardDiff.JacobianConfig{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2, Vector{ForwardDiff.Dual{ForwardDiff.Tag{typeof(badcopy), Float64}, Float64, 2}}})
     @ ForwardDiff ~/.julia/packages/ForwardDiff/PcZ48/src/jacobian.jl:19
  [13] top-level scope
-    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:300</code></pre>
+    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:322</code></pre>
 </div>
 </div>
 </section>
@@ -820,12 +865,12 @@ Stacktrace:
   [4] (::Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72
   [5] badcopy
-    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:298 [inlined]
-  [6] (::Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}})(Δ::Vector{Float64})
+    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:320 [inlined]
+  [6] (::Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0
-  [7] (::Zygote.var"#294#295"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}}})(Δ::Vector{Float64})
+  [7] (::Zygote.var"#294#295"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/lib.jl:206
-  [8] (::Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}}}}})(Δ::Vector{Float64})
+  [8] (::Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}}, Zygote.Pullback{Tuple{typeof(badcopy), Vector{Float64}}, Tuple{Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.ZBack{Returns{Tuple{ChainRulesCore.NoTangent, ChainRulesCore.NoTangent}}}, Zygote.var"#2633#back#549"{Zygote.var"#547#548"{Vector{Float64}}}}}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72
   [9] call_composed
     @ ./operators.jl:1045 [inlined]
@@ -835,7 +880,7 @@ Stacktrace:
     @ ./operators.jl:1044 [inlined]
  [12] #_#103
     @ ./operators.jl:1041 [inlined]
- [13] (::Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}, Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}}}}})(Δ::Vector{Float64})
+ [13] (::Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}}}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0
  [14] #294
     @ ~/.julia/packages/Zygote/NRp5C/src/lib/lib.jl:206 [inlined]
@@ -843,16 +888,16 @@ Stacktrace:
     @ ~/.julia/packages/ZygoteRules/M4xmc/src/adjoint.jl:72 [inlined]
  [16] ComposedFunction
     @ ./operators.jl:1041 [inlined]
- [17] (::Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.var"#2366#back#423"{Zygote.var"#pairs_namedtuple_pullback#422"{(), @NamedTuple{}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}, Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}}}}}}}, Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}}})(Δ::Vector{Float64})
+ [17] (::Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}}}}}}}, Zygote.var"#2366#back#423"{Zygote.var"#pairs_namedtuple_pullback#422"{(), @NamedTuple{}}}, Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface2.jl:0
- [18] (::Zygote.var"#78#79"{Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.var"#2366#back#423"{Zygote.var"#pairs_namedtuple_pullback#422"{(), @NamedTuple{}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}, Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}}}}}}}, Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}}}})(Δ::Vector{Float64})
+ [18] (::Zygote.var"#78#79"{Zygote.Pullback{Tuple{ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing, Nothing}, Tuple{Nothing}}, Zygote.Pullback{Tuple{Base.var"##_#103", @Kwargs{}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}}, Tuple{Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(Zygote._jvec)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(Zygote._jvec)}, Tuple{}}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:outer, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.unwrap_composed), typeof(badcopy)}, Tuple{Zygote.var"#2013#back#207"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Base.maybeconstructor), typeof(badcopy)}, Tuple{}}}}, Zygote.var"#2169#back#296"{Zygote.var"#294#295"{Tuple{Tuple{Nothing}, Tuple{Nothing}}, Zygote.var"#2013#back#207"{typeof(identity)}}}, Zygote.var"#2180#back#306"{Zygote.var"#back#305"{:inner, Zygote.Context{false}, ComposedFunction{typeof(Zygote._jvec), typeof(badcopy)}, typeof(badcopy)}}}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(Zygote._jvec), typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Tuple{Zygote.Pullback{Tuple{typeof(Zygote._jvec), Vector{Float64}}, Tuple{Zygote.Pullback{Tuple{typeof(vec), Vector{Float64}}, Tuple{}}}}, Zygote.var"#2029#back#216"{Zygote.var"#back#214"{2, 1, Zygote.Context{false}, typeof(Zygote._jvec)}}, Zygote.Pullback{Tuple{typeof(Base.call_composed), Tuple{typeof(badcopy)}, Tuple{Vector{Float64}}, @Kwargs{}}, Any}, Zygote.var"#2141#back#284"{Zygote.var"#280#283"}}}}}}}, Zygote.var"#2366#back#423"{Zygote.var"#pairs_namedtuple_pullback#422"{(), @NamedTuple{}}}, Zygote.Pullback{Tuple{Type{NamedTuple}}, Tuple{}}, Zygote.var"#2013#back#207"{typeof(identity)}}}})(Δ::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/compiler/interface.jl:91
  [19] withjacobian(f::Function, args::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/grad.jl:150
  [20] jacobian(f::Function, args::Vector{Float64})
     @ Zygote ~/.julia/packages/Zygote/NRp5C/src/lib/grad.jl:128
  [21] top-level scope
-    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:326</code></pre>
+    @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:348</code></pre>
 </div>
 </div>
 </section>
@@ -898,7 +943,7 @@ Stacktrace:
  [2] EnzymeCore.Active(x::Vector{Float64})
    @ EnzymeCore ~/.julia/packages/EnzymeCore/frpza/src/EnzymeCore.jl:50
  [3] top-level scope
-   @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:363</code></pre>
+   @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:385</code></pre>
 </div>
 </div>
 </section>
@@ -919,9 +964,8 @@ Stacktrace:
 <section id="goals" class="slide level2 scrollable">
 <h2>Goals</h2>
 <ul>
-<li><a href="https://github.com/gdalle/DifferentiationInterface.jl">DifferentiationInterface</a> (DI) offers a <strong>common syntax</strong> for all AD backends<sup>1</sup></li>
+<li><a href="https://github.com/gdalle/DifferentiationInterface.jl">DifferentiationInterface</a> (DI) offers a <strong>common syntax</strong> for all AD packages<sup>1</sup></li>
 <li>AD users can compare correctness and performance <strong>without reading each documentation</strong></li>
-<li>AD developers get access to a wider user base</li>
 </ul>
 <div class="callout callout-warning callout-titled callout-style-default">
 <div class="callout-body">
@@ -936,7 +980,7 @@ Stacktrace:
 </div>
 </div>
 </div>
-<aside><ol class="aside-footnotes"><li id="fn2"><p>inspired by <a href="https://github.com/JuliaDiff/AbstractDifferentiation.jl">AbstractDifferentiation</a></p></li></ol></aside></section>
+<aside><ol class="aside-footnotes"><li id="fn3"><p>inspired by <a href="https://github.com/JuliaDiff/AbstractDifferentiation.jl">AbstractDifferentiation</a></p></li></ol></aside></section>
 <section id="supported-packages" class="slide level2">
 <h2>Supported packages</h2>
 <!-- Using columns to fit everything on one slide -->
@@ -1000,18 +1044,52 @@ Stacktrace:
 <section id="features" class="slide level2">
 <h2>Features</h2>
 <ul>
-<li>Support for functions <code>f(x)</code> or <code>f!(y, x)</code> with <strong>scalar/array inputs &amp; outputs</strong></li>
-<li>Eight standard <strong>operators</strong>: <code>pushforward</code>, <code>pullback</code>, <code>derivative</code>, <code>gradient</code>, <code>jacobian</code>, <code>hvp</code>, <code>second_derivative</code>, <code>hessian</code></li>
-<li>Out-of-place and <strong>in-place</strong> versions</li>
+<li>Support for functions with <strong>scalar/array inputs &amp; outputs</strong>:
+<ul>
+<li><code>f(x, args...)</code></li>
+<li><code>f!(y, x, args...)</code></li>
+</ul></li>
+<li>Eight standard <strong>operators</strong> including <code>derivative</code>, <code>gradient</code>, <code>jacobian</code> and <code>hessian</code></li>
 <li><strong>Combine</strong> different backends using <code>SecondOrder</code></li>
 <li><strong>Translate</strong> between backends using <code>DifferentiateWith</code></li>
+<li>Exploit Jacobian / Hessian <strong>sparsity</strong> with <code>AutoSparse</code></li>
 </ul>
 </section></section>
+<section>
 <section id="sparsity" class="title-slide slide level1 center">
 <h1>Sparsity</h1>
 
 </section>
-
+<section id="compressed-evaluation" class="slide level2">
+<h2>Compressed evaluation</h2>
+<p>Forward mode Jacobians are evaluated column by column.</p>
+<p>If we know that two columns don’t overlap, we can evaluate them at the same time.</p>
+</section>
+<section id="how-many-jvps" class="slide level2">
+<h2>How many JVPs?</h2>
+<p>Efficient grouping of non-overlapping columns = graph coloring problem.</p>
+<div id="30" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">SparseMatrixColorings</span>, <span class="bu">SparseArrays</span>, <span class="bu">Images</span></span>
+<span id="cb26-2"><a aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="fu">spdiagm</span>(<span class="fl">0</span> <span class="op">=&gt;</span> <span class="fu">ones</span>(<span class="dt">Bool</span>, <span class="fl">10</span>), <span class="op">-</span><span class="fl">1</span> <span class="op">=&gt;</span> <span class="fu">ones</span>(<span class="dt">Bool</span>, <span class="fl">9</span>), <span class="op">+</span><span class="fl">1</span> <span class="op">=&gt;</span> <span class="fu">ones</span>(<span class="dt">Bool</span>, <span class="fl">9</span>))</span>
+<span id="cb26-3"><a aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="fu">coloring</span>(J, <span class="fu">ColoringProblem</span><span class="dt">{:nonsymmetric,:column}</span>(), <span class="fu">GreedyColoringAlgorithm</span>())</span>
+<span id="cb26-4"><a aria-hidden="true" tabindex="-1"></a><span class="fu">show_colors</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>UndefVarError: UndefVarError(:show_colors)
+UndefVarError: `show_colors` not defined
+Stacktrace:
+ [1] top-level scope
+   @ ~/work/JuliaOptimizationDays2024-AutoDiff/JuliaOptimizationDays2024-AutoDiff/index.qmd:509</code></pre>
+</div>
+</div>
+</section>
+<section id="new-sparse-ad-ecosystem" class="slide level2">
+<h2>New sparse AD ecosystem</h2>
+<ul>
+<li><a href="https://github.com/adrhill/SparseConnectivityTracer.jl">SparseConnectivityTracer</a> for sparsity pattern detection</li>
+<li><a href="https://github.com/gdalle/SparseMatrixColorings.jl">SparseMatrixColorings</a> for matrix coloring and decompression</li>
+<li>DifferentiationInterface for compressed differentiation</li>
+</ul>
+</section></section>
 <section>
 <section id="conclusion" class="title-slide slide level1 center">
 <h1>Conclusion</h1>
