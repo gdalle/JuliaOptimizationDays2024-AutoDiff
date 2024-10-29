@@ -33,6 +33,12 @@ execute:
 
 # Introduction
 
+## Slides
+
+<https://gdalle.github.io/JuliaOptimizationDays2024-AutoDiff/>
+
+![](https://i.imgur.com/Nxt5Ft6.png)
+
 ## Motivation
 
 ::: {.callout-note}
@@ -75,7 +81,9 @@ $$\partial f(x)[v] = \lim_{\varepsilon \to 0} \frac{f(x + \varepsilon v) - f(x)}
 - **Manual**: work out $\partial f$ by hand
 - **Numeric**: $\partial f(x)[v] \approx \frac{f(x+\varepsilon v) - f(x)}{\varepsilon}$
 - **Symbolic**: enter a formula for $f$, get a formula for $\partial f$
-- **Automatic**: code a program for $f$, get a program for $\partial f(x)$
+- **Automatic**[^a]: code a program for $f$, get a program for $\partial f(x)$
+
+[^a]: or algorithmic
 
 ## Two ingredients of AD
 
@@ -86,11 +94,11 @@ Any derivative can be obtained from:
 
 $$\partial (f \circ g)(x) = \partial f(g(x)) \circ \partial g(x)$$
 
-or its adjoint[^*]
+or its adjoint[^b]
 
 $$\partial (f \circ g)^*(x) = \partial g(x)^* \circ \partial f(g(x))^*$$
 
-[^*]: the "transpose" of a linear map
+[^b]: the "transpose" of a linear map
 
 ## Homemade AD (1)
 
@@ -121,8 +129,8 @@ Let's try it out
 
 ```{julia}
 complicated_function = square ∘ double ∘ square ∘ double
-x = [3, 5]
-v = [1, 2];
+x = [3.0, 5.0]
+v = [1.0, 0.0];
 ∂(complicated_function)(x)(v)
 ```
 ```{julia}
@@ -189,9 +197,37 @@ $$((\underbrace{(\underbrace{w^\top J_L}_{w_L}) J_{L-1}}_{w_{L-1}} \dots ) J_2 )
 
 Reverse mode AD relies on the adjoint chain rule.
 
-## Computational complexity
+## Jacobian matrices are back
 
-Consider $f : \mathbb{R}^n \to \mathbb{R}^m$. How much does its Jacobian cost?
+Consider $f : \mathbb{R}^n \to \mathbb{R}^m$. How to recover the full Jacobian?
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Forward mode**
+
+Column by column:
+
+$$J = \begin{pmatrix} J e_1 & \dots & J e_n \end{pmatrix}$$
+
+where $e_i$ is a basis vector.
+
+:::
+
+::: {.column width="50%"}
+**Reverse mode**
+
+Row by row:
+
+$$J = \begin{pmatrix} e_1^\top J \\ \vdots \\ e_m^\top J \end{pmatrix}$$
+
+:::
+
+::::
+
+## Complexities
+
+Consider $f : \mathbb{R}^n \to \mathbb{R}^m$. How much does a Jacobian cost?
 
 ::: {.callout-important}
 ## Theorem
@@ -199,27 +235,13 @@ Consider $f : \mathbb{R}^n \to \mathbb{R}^m$. How much does its Jacobian cost?
 Each JVP or VJP takes as much time and space as $O(1)$ calls to $f$.
 :::
 
-:::: {.columns}
+| sizes | jacobian | forward | reverse | best mode
+|---|---|---|---|---|
+| generic | jacobian | $O(n)$ | $O(m)$ | depends |
+| $n = 1$ | derivative | $O(1)$ | $O(m)$ | forward |
+| $m = 1$ | gradient | $O(n)$ | $O(1)$ | reverse |
 
-::: {.column width="50%"}
-**Forward mode**
-
-Column by column: $O(n)$
-
-$$J = \begin{pmatrix} J e_1 & \dots & J e_n \end{pmatrix}$$
-
-:::
-
-::: {.column width="50%"}
-**Reverse mode**
-
-Row by row: $O(m)$
-
-$$J = \begin{pmatrix} e_1^\top J \\ \dots \\ e_m^\top J \end{pmatrix}$$
-
-:::
-
-::::
+**Fast reverse mode gradients make deep learning possible.**
 
 # Using AD
 
@@ -241,7 +263,7 @@ Image: courtesy of Adrian Hill
 
 Image: courtesy of Adrian Hill
 
-## Why so many backends?
+## Why so many packages?
 
 - Conflicting **paradigms**:
   - numeric vs. symbolic vs. algorithmic
@@ -249,26 +271,26 @@ Image: courtesy of Adrian Hill
 - Cover varying **subsets of the language**
 - Historical reasons: developed by **different people**
 
-Exhaustive list available at <https://juliadiff.org/>.
+Full list available at <https://juliadiff.org/>.
 
 ## Meaningful criteria
 
-- Does this AD backend **execute** **without error**?
+- Does this AD package **execute** **without error**?
 - Does it return the **right derivative**?
 - Does it run **fast enough** for me?
 
 ## A simple decision tree
 
 1. **Follow recommendations** of high-level library (e.g. Flux).
-2. Otherwise, **choose mode** from input/output dimensions.
-3. Try the most **battle-tested** backends:
+2. Otherwise, **choose best mode** from input/output dimensions.
+3. Then try the most **battle-tested** packages:
    - [ForwardDiff](https://github.com/JuliaDiff/ForwardDiff.jl) or [Enzyme](https://github.com/EnzymeAD/Enzyme.jl) in forward mode,
    - [Zygote](https://github.com/FluxML/Zygote.jl) or [Enzyme](https://github.com/EnzymeAD/Enzyme.jl) in reverse mode.
 4. If nothing works, fall back on finite differences.
 
 # Enabling AD
 
-## Each backend has demands
+## Each package has demands
 
 - ForwardDiff: generic number types
 - Zygote: no mutation
@@ -351,9 +373,10 @@ Enzyme.autodiff(
 
 ## Goals
 
-- [DifferentiationInterface](https://github.com/gdalle/DifferentiationInterface.jl) (DI) offers a **common syntax** for all AD backends^[inspired by [AbstractDifferentiation](https://github.com/JuliaDiff/AbstractDifferentiation.jl)]
+- [DifferentiationInterface](https://github.com/gdalle/DifferentiationInterface.jl) (DI) offers a **common syntax** for all AD packages[^c]
 - AD users can compare correctness and performance **without reading each documentation**
-- AD developers get access to a wider user base
+
+[^c]: inspired by [AbstractDifferentiation](https://github.com/JuliaDiff/AbstractDifferentiation.jl)
 
 ::: {.callout-warning}
 ## The fine print
@@ -413,13 +436,38 @@ value_and_gradient(f, AutoZygote(), x)
 
 ## Features
 
-- Support for functions `f(x)` or `f!(y, x)` with **scalar/array inputs & outputs**
-- Eight standard **operators**: `pushforward`, `pullback`, `derivative`, `gradient`, `jacobian`, `hvp`, `second_derivative`, `hessian`
-- Out-of-place and **in-place** versions
+- Support for functions with **scalar/array inputs & outputs**:
+  - `f(x, args...)`
+  - `f!(y, x, args...)` 
+- Eight standard **operators** including `derivative`, `gradient`, `jacobian` and `hessian`
 - **Combine** different backends using `SecondOrder`
 - **Translate** between backends using `DifferentiateWith`
+- Exploit Jacobian / Hessian **sparsity** with `AutoSparse`
 
 # Sparsity
+
+## Compressed evaluation
+
+Forward mode Jacobians are evaluated column by column.
+
+If we know that two columns don't overlap, we can evaluate them at the same time.
+
+## How many JVPs?
+
+Efficient grouping of non-overlapping columns = graph coloring problem.
+
+```{julia}
+using SparseMatrixColorings, SparseArrays, Images
+J = spdiagm(0 => ones(Bool, 10), -1 => ones(Bool, 9), +1 => ones(Bool, 9))
+result = coloring(J, ColoringProblem{:nonsymmetric,:column}(), GreedyColoringAlgorithm())
+show_colors(result)
+```
+
+## New sparse AD ecosystem
+
+- [SparseConnectivityTracer](https://github.com/adrhill/SparseConnectivityTracer.jl) for sparsity pattern detection
+- [SparseMatrixColorings](https://github.com/gdalle/SparseMatrixColorings.jl) for matrix coloring and decompression
+- DifferentiationInterface for compressed differentiation
 
 # Conclusion
 
