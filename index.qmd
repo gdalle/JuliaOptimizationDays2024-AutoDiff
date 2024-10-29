@@ -104,23 +104,30 @@ $$\partial (f \circ g)^*(x) = \partial g(x)^* \circ \partial f(g(x))^*$$
 
 Basic functions
 ```{julia}
+#| output: false
 double(x) = 2x
-∂(::typeof(double)) = x -> (v -> 2v);  # independent from x
+∂(::typeof(double)) = x -> (v -> 2v)  # independent from x
 ```
 
 
 ```{julia}
+#| output: false
 square(x) = x .^ 2
-∂(::typeof(square)) = x -> (v -> v .* 2x);  # depends on x
+∂(::typeof(square)) = x -> (v -> v .* 2x)  # depends on x
 ```
 
 Chain rule
 
 ```{julia}
+typeof(square ∘ double)
+```
+
+```{julia}
+#| output: false
 function ∂(c::ComposedFunction)
     f, g = c.outer, c.inner
     return x -> ∂(f)(g(x)) ∘ ∂(g)(x)
-end;
+end
 ```
 
 ## Homemade AD (2)
@@ -281,12 +288,12 @@ Full list available at <https://juliadiff.org/>.
 
 ## A simple decision tree
 
-1. **Follow recommendations** of high-level library (e.g. Flux).
-2. Otherwise, **choose best mode** from input/output dimensions.
+1. **Follow recommendations** of high-level library (e.g. [Flux.jl](https://github.com/FluxML/Flux.jl)).
+2. Otherwise, **choose mode** from input/output dimensions.
 3. Then try the most **battle-tested** packages:
-   - [ForwardDiff](https://github.com/JuliaDiff/ForwardDiff.jl) or [Enzyme](https://github.com/EnzymeAD/Enzyme.jl) in forward mode,
-   - [Zygote](https://github.com/FluxML/Zygote.jl) or [Enzyme](https://github.com/EnzymeAD/Enzyme.jl) in reverse mode.
-4. If nothing works, fall back on finite differences.
+   - [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl) or [Enzyme.jl](https://github.com/EnzymeAD/Enzyme.jl) in forward mode,
+   - [Zygote.jl](https://github.com/FluxML/Zygote.jl) or [Enzyme.jl](https://github.com/EnzymeAD/Enzyme.jl) in reverse mode.
+4. If nothing works, finite differences ($\sim$ forward mode).
 
 # Enabling AD
 
@@ -294,9 +301,9 @@ Full list available at <https://juliadiff.org/>.
 
 - ForwardDiff: generic number types
 - Zygote: no mutation
-- Enzyme: correct annotations, type stability
+- Enzyme: correct activity annotations, type stability (not covered here)
 
-## Typical ForwardDiff misuse
+## Typical ForwardDiff issue
 
 ```{julia}
 import ForwardDiff
@@ -316,7 +323,7 @@ goodcopy(x) = copyto!(zeros(eltype(x), size(x)), x)
 ForwardDiff.jacobian(goodcopy, ones(2))
 ```
 
-## Typical Zygote misuse
+## Typical Zygote issue
 
 ```{julia}
 import Zygote
@@ -335,77 +342,49 @@ badcopy2(x) = badcopy(x)
 
 function ChainRulesCore.rrule(::typeof(badcopy2), x)
     y = badcopy2(x)
-    function badcopy2_pullback(dy)
-        df, dx = NoTangent(), I' * dy  # VJP
-        return (df, dx)
-    end
-    return y, badcopy2_pullback
+    badcopy2_vjp(dy) = NoTangent(), I' * dy
+    return y, badcopy2_vjp
 end
 
 Zygote.jacobian(badcopy2, ones(2))
-```
-
-## Typical Enzyme misuse 
-
-```{julia}
-import Enzyme
-
-Enzyme.autodiff(
-  Enzyme.Forward,
-  badcopy,
-  Enzyme.Active(ones(2))
-)
-```
-
-## Enzyme troubleshooting
-
-Pay attention to activity annotations, type stability and temporary storage (see the [FAQ](https://enzymead.github.io/Enzyme.jl/stable/faq/)).
-
-```julia
-Enzyme.autodiff(
-  Enzyme.Forward,
-  badcopy,
-  Enzyme.Duplicated(ones(2), zeros(2))
-)
 ```
 
 # DifferentiationInterface
 
 ## Goals
 
-- [DifferentiationInterface](https://github.com/gdalle/DifferentiationInterface.jl) (DI) offers a **common syntax** for all AD packages[^c]
+- [DifferentiationInterface.jl](https://github.com/JuliaDiff/DifferentiationInterface.jl) (DI) offers a **common syntax** for all AD packages[^c]
 - AD users can compare correctness and performance **without reading each documentation**
 
-[^c]: inspired by [AbstractDifferentiation](https://github.com/JuliaDiff/AbstractDifferentiation.jl)
+[^c]: inspired by [AbstractDifferentiation.jl](https://github.com/JuliaDiff/AbstractDifferentiation.jl)
 
 ::: {.callout-warning}
 ## The fine print
 
-DI may be slower than a direct call to the backend's API (mostly with Enzyme).
+DI may be slower than a direct call to the package's API (mostly with Enzyme).
 :::
 
 ## Supported packages
 
-<!-- Using columns to fit everything on one slide -->
 :::: {.columns}
 
 ::: {.column width="50%"}
-* [ChainRulesCore](https://github.com/JuliaDiff/ChainRulesCore.jl)
-* [Diffractor](https://github.com/JuliaDiff/Diffractor.jl)
-* [Enzyme](https://github.com/EnzymeAD/Enzyme.jl)
-* [FastDifferentiation](https://github.com/brianguenter/FastDifferentiation.jl)
-* [FiniteDiff](https://github.com/JuliaDiff/FiniteDiff.jl)
-* [FiniteDifferences](https://github.com/JuliaDiff/FiniteDifferences.jl)
-* [ForwardDiff](https://github.com/JuliaDiff/ForwardDiff.jl)
+* [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl)
+* [Diffractor.jl](https://github.com/JuliaDiff/Diffractor.jl)
+* [Enzyme.jl](https://github.com/EnzymeAD/Enzyme.jl)
+* [FastDifferentiation.jl](https://github.com/brianguenter/FastDifferentiation.jl)
+* [FiniteDiff.jl](https://github.com/JuliaDiff/FiniteDiff.jl)
+* [FiniteDifferences.jl](https://github.com/JuliaDiff/FiniteDifferences.jl)
+* [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl)
 :::
 
 ::: {.column width="50%"}
-* [PolyesterForwardDiff](https://github.com/JuliaDiff/PolyesterForwardDiff.jl)
-* [ReverseDiff](https://github.com/JuliaDiff/ReverseDiff.jl)
-* [Symbolics](https://github.com/JuliaSymbolics/Symbolics.jl)
-* [Mooncake](https://github.com/compintell/Mooncake.jl)
-* [Tracker](https://github.com/FluxML/Tracker.jl)
-* [Zygote](https://github.com/FluxML/Zygote.jl)
+* [PolyesterForwardDiff.jl](https://github.com/JuliaDiff/PolyesterForwardDiff.jl)
+* [ReverseDiff.jl](https://github.com/JuliaDiff/ReverseDiff.jl)
+* [Symbolics.jl](https://github.com/JuliaSymbolics/Symbolics.jl)
+* [Mooncake.jl](https://github.com/compintell/Mooncake.jl)
+* [Tracker.jl](https://github.com/FluxML/Tracker.jl)
+* [Zygote.jl](https://github.com/FluxML/Zygote.jl)
 :::
 
 ::::
@@ -420,7 +399,7 @@ f(x) = sum(abs2, x)
 x = [1.0, 2.0, 3.0, 4.0]
 ```
 
-2. Combine one of DI's operators with a backend from [ADTypes](https://github.com/SciML/ADTypes.jl)
+2. Use one of DI's operators with a backend from [ADTypes.jl](https://github.com/SciML/ADTypes.jl)
 
 ```{julia}
 value_and_gradient(f, AutoForwardDiff(), x)
@@ -446,11 +425,11 @@ value_and_gradient(f, AutoZygote(), x)
 
 # Sparsity
 
-## Compressed evaluation
+## Compressed differentiation
 
-If two columns don't overlap:
+If two Jacobian columns don't overlap:
 
-1. evaluate their sum in one JVP
+1. evaluate their sum in 1 JVP instead of 2
 2. redistribute the nonzero coefficients.
 
 $$J = \begin{pmatrix}
@@ -460,25 +439,89 @@ $$J = \begin{pmatrix}
 \cdot & 4 & 8
 \end{pmatrix} \quad \implies \quad J(e_1 + e_2) \text{ and } J e_3$$
 
-## How many JVPs?
+## Prerequisite 1: pattern detection
 
-Efficient grouping of non-overlapping columns = graph coloring problem.
+Find which coefficients _might_ be nonzero.
+
+:::: {.columns}
+
+::: {.column width="40%"}
 
 ```{julia}
-using SparseMatrixColorings, SparseArrays, Images
-J = spdiagm(0 => ones(Bool, 10), -1 => ones(Bool, 9), +1 => ones(Bool, 9))
+#| output: false
+struct T <: Real  # tracer
+    set::Set{Int}
+end
 ```
 
+:::
+
+::: {.column width="60%"}
 ```{julia}
-result = coloring(J, ColoringProblem{:nonsymmetric,:column}(), GreedyColoringAlgorithm())
-column_colors(result)'
+#| output: false
+Base.:+(a::T, b::T) = T(a.set ∪ b.set)
+Base.:*(a::T, b::T) = T(a.set ∪ b.set)
+Base.sign(x::T) = T(Set{Int}())
 ```
+:::
+
+::::
+
+Trace dependencies on inputs during function execution.
+
+```{julia}
+f(x) = x[1] + sign(x[2]) * x[3]
+
+xt = T.([Set(1), Set(2), Set(3)])
+yt = f(xt)
+```
+
+## Prerequisite 2: pattern coloring
+
+Split columns into non-overlapping groups.
+
+```{julia}
+#| echo: false
+#| output: false
+using SparseMatrixColorings, Images, ColorSchemes
+function show_colors(A; kwargs...)
+    problem = ColoringProblem{:nonsymmetric,:column}()
+    algo = GreedyColoringAlgorithm()
+    result = coloring(A, problem, algo)
+    ncolors = maximum(column_colors(result)) # for partition=:column
+    background=RGB(1, 1, 1)
+    colorscheme = get(ColorSchemes.rainbow, range(0.0, 1.0, length=ncolors))  
+    return SparseMatrixColorings.show_colors(result; colorscheme, background, kwargs...)
+end
+```
+
+:::: {.columns}
+
+::: {.column width="50%"}
+```{julia}
+using SparseArrays
+J = sprand(30, 30, 0.2)
+show_colors(J; scale=10, pad=2)
+```
+:::
+
+::: {.column width="50%"}
+```{julia}
+using BandedMatrices
+J = brand(30, 30, 3, 3)
+show_colors(J; scale=10, pad=2)
+```
+:::
+
+::::
 
 ## New sparse AD ecosystem
 
-- [SparseConnectivityTracer](https://github.com/adrhill/SparseConnectivityTracer.jl) for sparsity pattern detection
-- [SparseMatrixColorings](https://github.com/gdalle/SparseMatrixColorings.jl) for matrix coloring and decompression
-- DifferentiationInterface for compressed differentiation
+- [SparseConnectivityTracer.jl](https://github.com/adrhill/SparseConnectivityTracer.jl): pattern detection
+- [SparseMatrixColorings.jl](https://github.com/gdalle/SparseMatrixColorings.jl): coloring and decompression
+- [DifferentiationInterface.jl](https://github.com/JuliaDiff/DifferentiationInterface.jl): compressed differentiation
+
+Already used by [SciML](https://github.com/SciML) and [JuliaSmoothOptimizers](https://github.com/JuliaSmoothOptimizers).
 
 # Conclusion
 
@@ -491,9 +534,11 @@ column_colors(result)'
 
 ## Take-home message
 
-**Computing derivatives is easy**, but each AD solution comes with its own **limitations**.
+Computing derivatives is **automatic** and efficient.
 
-Learn to recognize and overcome them, either as a user or as a developer.
+Each AD system comes with **limitations**.
+
+Learn to recognize and overcome them.
 
 ## References
 
