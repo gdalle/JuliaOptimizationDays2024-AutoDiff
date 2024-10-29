@@ -448,9 +448,17 @@ value_and_gradient(f, AutoZygote(), x)
 
 ## Compressed evaluation
 
-Forward mode Jacobians are evaluated column by column.
+If two columns don't overlap:
 
-If we know that two columns don't overlap, we can evaluate them at the same time.
+1. evaluate their sum in one JVP
+2. redistribute the nonzero coefficients.
+
+$$J = \begin{pmatrix}
+1 & \cdot & 5 \\
+\cdot & 3 & 6 \\
+2 & \cdot & 7 \\
+\cdot & 4 & 8
+\end{pmatrix} \quad \implies \quad J(e_1 + e_2) \text{ and } J e_3$$
 
 ## How many JVPs?
 
@@ -459,8 +467,11 @@ Efficient grouping of non-overlapping columns = graph coloring problem.
 ```{julia}
 using SparseMatrixColorings, SparseArrays, Images
 J = spdiagm(0 => ones(Bool, 10), -1 => ones(Bool, 9), +1 => ones(Bool, 9))
+```
+
+```{julia}
 result = coloring(J, ColoringProblem{:nonsymmetric,:column}(), GreedyColoringAlgorithm())
-show_colors(result)
+column_colors(result)'
 ```
 
 ## New sparse AD ecosystem
