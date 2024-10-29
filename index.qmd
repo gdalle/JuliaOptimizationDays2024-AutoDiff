@@ -490,7 +490,8 @@ function show_colors(A; kwargs...)
     result = coloring(A, problem, algo)
     ncolors = maximum(column_colors(result)) # for partition=:column
     background=RGB(1, 1, 1)
-    colorscheme = get(ColorSchemes.rainbow, range(0.0, 1.0, length=ncolors))  
+    colorscheme = get(ColorSchemes.rainbow, range(0.0, 1.0, length=ncolors)) 
+    @info "Colored a $(size(A)) matrix with $ncolors colors" 
     return SparseMatrixColorings.show_colors(result; colorscheme, background, kwargs...)
 end
 ```
