@@ -290,9 +290,9 @@ Full list available at <https://juliadiff.org/>.
 
 1. **Follow recommendations** of high-level library (e.g. [Flux.jl](https://github.com/FluxML/Flux.jl)).
 2. Otherwise, **choose mode** from input/output dimensions.
-3. Then try the most **battle-tested** packages:
+3. Then try the most **thoroughly tested** packages:
    - [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl) or [Enzyme.jl](https://github.com/EnzymeAD/Enzyme.jl) in forward mode,
-   - [Zygote.jl](https://github.com/FluxML/Zygote.jl) or [Enzyme.jl](https://github.com/EnzymeAD/Enzyme.jl) in reverse mode.
+   - [Zygote.jl](https://github.com/FluxML/Zygote.jl), [Enzyme.jl](https://github.com/EnzymeAD/Enzyme.jl) or [Mooncake.jl](https://github.com/compintell/Mooncake.jl) in reverse mode.
 4. If nothing works, finite differences ($\sim$ forward mode).
 
 # Enabling AD
